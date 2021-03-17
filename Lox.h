@@ -3,6 +3,8 @@
 class Lox
 {
 public:
+    static bool hadError;
+
     static void runFile(char *filename)
     {
         std::ifstream infile(filename, std::ios::in | std::ios::binary);
@@ -12,6 +14,10 @@ public:
             content << infile.rdbuf();
             infile.close();
             run(content.str());
+            if (hadError)
+            {
+                exit(65);
+            }
         }
     }
 
@@ -24,6 +30,7 @@ public:
             if (std::getline(std::cin, line))
             {
                 run(line);
+                hadError = false;
             }
             else
             {
@@ -42,4 +49,17 @@ public:
             std::cout << token << std::endl;
         }
     }
+
+    static void error(int line, std::string message)
+    {
+        report(line, "", message);
+    }
+
+    static void report(int line, std::string where, std::string message)
+    {
+        std::cerr << "[line " << line << "] Error " << where << ": " << message << std::endl;
+        hadError = true;
+    }
 };
+
+bool Lox::hadError = false;

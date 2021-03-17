@@ -153,6 +153,7 @@
     <ClInclude Include="Lox.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="Token.h" />
+    <ClInclude Include="TokenType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
