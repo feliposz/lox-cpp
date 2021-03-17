@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+#include "TokenType.h"
 
 class Token
 {
@@ -9,33 +11,8 @@ public:
     double numLiteral;
     int line;
 
-    Token(TokenType type_, std::string lexeme_, std::string strLiteral_, double numLiteral_, int line_)
-    {
-        type = type_;
-        lexeme = lexeme_;
-        strLiteral = strLiteral_;
-        numLiteral = numLiteral_;
-        line = line_;
-    }
-
-    std::string str()
-    {
-        std::ostringstream s;
-        s << TokenTypeNames[type] << " " << lexeme;
-        if (type == STRING)
-        {
-            s << " " << strLiteral;
-        }
-        else if (type == NUMBER)
-        {
-            s << " " << numLiteral;
-        }
-        return s.str();
-    }
+    Token(TokenType type_, std::string lexeme_, std::string strLiteral_, double numLiteral_, int line_);
+    std::string str();
 };
 
-std::ostream &operator<<(std::ostream &os, Token &t)
-{
-    os << t.str();
-    return os;
-}
+std::ostream &operator<<(std::ostream &os, Token &t);

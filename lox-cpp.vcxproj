@@ -148,6 +148,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lox-cpp.cpp" />
+    <ClCompile Include="Lox.cpp" />
+    <ClCompile Include="Scanner.cpp" />
+    <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lox.h" />
