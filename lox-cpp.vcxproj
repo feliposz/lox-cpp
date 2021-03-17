@@ -149,6 +149,11 @@
   <ItemGroup>
     <ClCompile Include="lox-cpp.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Lox.h" />
+    <ClInclude Include="Scanner.h" />
+    <ClInclude Include="Token.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
