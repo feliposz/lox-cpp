@@ -66,7 +66,14 @@ void Scanner::scanToken()
             string();
             break;
         default:
-            Lox::error(line, "Invalid character");
+            if (isDigit(c))
+            {
+                number();
+            }
+            else
+            {
+                Lox::error(line, "Invalid character");
+            }
             break;
     }
 }
@@ -106,10 +113,26 @@ char Scanner::peek()
     return source[current];
 }
 
+char Scanner::peekNext()
+{
+    if ((current + 1) >= source.length())
+    {
+        return '\0';
+    }
+    return source[current + 1];
+}
+
 void Scanner::addString(std::string str)
 {
     std::string substr = source.substr(start, current - start);
     Token token(STRING, substr, str, 0, line);
+    tokens.push_back(token);
+}
+
+void Scanner::addNumber(double num)
+{
+    std::string substr = source.substr(start, current - start);
+    Token token(NUMBER, substr, "", num, line);
     tokens.push_back(token);
 }
 
@@ -135,4 +158,31 @@ void Scanner::string()
     // remove enclosing ""
     std::string str = source.substr(start + 1, current - start - 2);
     addString(str);
+}
+
+bool Scanner::isDigit(char c)
+{
+    return (c >= '0') && (c <= '9');
+}
+
+void Scanner::number()
+{
+    while (isDigit(peek()))
+    {
+        advance();
+    }
+
+    if ((peek() == '.') && isDigit(peekNext()))
+    {
+        advance();
+
+        while (isDigit(peek()))
+        {
+            advance();
+        }
+    }
+
+    std::string str = source.substr(start, current - start);
+    double num = stod(str);
+    addNumber(num);
 }

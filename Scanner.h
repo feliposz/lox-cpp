@@ -19,7 +19,11 @@ public:
     char advance();
     void addToken(TokenType type);
     void addString(std::string str);
+    void addNumber(double num);
     bool match(char expected);
     char peek();
+    char peekNext();
     void string();
+    bool isDigit(char c);
+    void number();
 };
