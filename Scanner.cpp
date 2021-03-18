@@ -30,19 +30,41 @@ void Scanner::scanToken()
     {
         case '(': addToken(LEFT_PAREN); break;
         case ')': addToken(RIGHT_PAREN); break;
-        case '[': addToken(LEFT_BRACE); break;
-        case ']': addToken(RIGHT_BRACE); break;
+        case '{': addToken(LEFT_BRACE); break;
+        case '}': addToken(RIGHT_BRACE); break;
         case ',': addToken(COMMA); break;
         case '.': addToken(DOT); break;
         case '-': addToken(MINUS); break;
         case '+': addToken(PLUS); break;
         case ';': addToken(SEMICOLON); break;
-        case '/': addToken(SLASH); break;
+        case '/':
+            if (match('/'))
+            {
+                while ((peek() != '\n') && !isAtEnd())
+                {
+                    advance();
+                }
+            }
+            else
+            {
+                addToken(SLASH);
+            }
+        break;        
         case '*': addToken(STAR); break;
-        case '!': addToken(BANG); break;
-        case '=': addToken(EQUAL); break;
-        case '>': addToken(GREATER); break;
-        case '<': addToken(LESS); break;
+        case '!': addToken(match('=') ? BANG_EQUAL : BANG); break;
+        case '=': addToken(match('=') ? EQUAL_EQUAL : EQUAL); break;
+        case '>': addToken(match('=') ? GREATER_EQUAL : GREATER); break;
+        case '<': addToken(match('=') ? LESS_EQUAL : LESS); break;
+        case ' ':
+        case '\r':
+        case '\t':
+            break;
+        case '\n':
+            line++;
+            break;
+        case '"':
+            string();
+            break;
         default:
             Lox::error(line, "Invalid character");
             break;
@@ -59,4 +81,58 @@ void Scanner::addToken(TokenType type)
     std::string substr = source.substr(start, current - start);
     Token token(type, substr, "", 0, line);
     tokens.push_back(token);
+}
+
+bool Scanner::match(char expected)
+{
+    if (isAtEnd())
+    {
+        return false;
+    }
+    else if (source[current] != expected)
+    {
+        return false;
+    }
+    current++;
+    return true;
+}
+
+char Scanner::peek()
+{
+    if (isAtEnd())
+    {
+        return '\0';
+    }
+    return source[current];
+}
+
+void Scanner::addString(std::string str)
+{
+    std::string substr = source.substr(start, current - start);
+    Token token(STRING, substr, str, 0, line);
+    tokens.push_back(token);
+}
+
+void Scanner::string()
+{
+    while ((peek() != '"') && !isAtEnd())
+    {
+        if (peek() == '\n')
+        {
+            line++;
+        }
+        advance();
+    }
+
+    if (isAtEnd())
+    {
+        Lox::error(line, "Unterminated string");
+        return;
+    }
+
+    advance(); // closing "
+
+    // remove enclosing ""
+    std::string str = source.substr(start + 1, current - start - 2);
+    addString(str);
 }
