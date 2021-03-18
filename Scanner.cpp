@@ -46,6 +46,10 @@ void Scanner::scanToken()
                     advance();
                 }
             }
+            else if (match('*'))
+            {
+                blockComment();
+            }
             else
             {
                 addToken(SLASH);
@@ -241,4 +245,33 @@ void Scanner::identifier()
         type = IDENTIFIER;
     }
     addToken(type);
+}
+
+void Scanner::blockComment()
+{
+    while (!isAtEnd())
+    {
+        if (peek() == '\n')
+        {
+            line++;
+            advance();
+        }
+        else if ((peek() == '/') && (peekNext() == '*'))
+        {
+            advance();
+            advance();
+            blockComment(); // nested comment
+        }
+        else if ((peek() == '*') && (peekNext() == '/'))
+        {
+            advance();
+            advance();
+            return;
+        }
+        else
+        {
+            advance();
+        }
+    }
+    Lox::error(line, "Unterminated comment");
 }

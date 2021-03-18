@@ -29,4 +29,5 @@ public:
     bool isAlphaNum(char c);
     void number();
     void identifier();
+    void blockComment();
 };
