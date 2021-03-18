@@ -1,3 +1,4 @@
+#include <unordered_map>
 #include "Lox.h"
 #include "Scanner.h"
 
@@ -69,6 +70,10 @@ void Scanner::scanToken()
             if (isDigit(c))
             {
                 number();
+            }
+            else if (isAlpha(c))
+            {
+                identifier();
             }
             else
             {
@@ -165,6 +170,16 @@ bool Scanner::isDigit(char c)
     return (c >= '0') && (c <= '9');
 }
 
+bool Scanner::isAlpha(char c)
+{
+    return ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')) || (c == '_');
+}
+
+bool Scanner::isAlphaNum(char c)
+{
+    return isDigit(c) || isAlpha(c);
+}
+
 void Scanner::number()
 {
     while (isDigit(peek()))
@@ -185,4 +200,45 @@ void Scanner::number()
     std::string str = source.substr(start, current - start);
     double num = stod(str);
     addNumber(num);
+}
+
+static std::unordered_map<std::string, TokenType> keywords({
+    { "and", AND },
+    { "class", CLASS },
+    { "else", ELSE },
+    { "false", FALSE },
+    { "for", FOR },
+    { "fun", FUN },
+    { "if", IF },
+    { "nil", NIL },
+    { "or", OR },
+    { "print", PRINT },
+    { "return", RETURN },
+    { "super", SUPER },
+    { "this", THIS },
+    { "true", TRUE },
+    { "var", VAR },
+    { "while", WHILE }
+});
+
+void Scanner::identifier()
+{
+    while (isAlphaNum(peek()))
+    {
+        advance();
+    }
+
+    TokenType type;
+    std::string str = source.substr(start, current - start);
+    auto it = keywords.find(str);
+
+    if (it != keywords.end())
+    {
+        type = it->second;
+    }
+    else
+    {
+        type = IDENTIFIER;
+    }
+    addToken(type);
 }

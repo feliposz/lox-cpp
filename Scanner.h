@@ -25,5 +25,8 @@ public:
     char peekNext();
     void string();
     bool isDigit(char c);
+    bool isAlpha(char c);
+    bool isAlphaNum(char c);
     void number();
+    void identifier();
 };
