@@ -14,7 +14,8 @@ std::list<Token> Scanner::scanTokens()
         start = current;
         scanToken();
     }
-    Token eofToken(EOF_TOKEN, "", "", 0, line);
+    Object nil;
+    Token eofToken(EOF_TOKEN, "", &nil, line);
     tokens.push_back(eofToken);
     return tokens;
 }
@@ -95,7 +96,8 @@ char Scanner::advance()
 void Scanner::addToken(TokenType type)
 {
     std::string substr = source.substr(start, current - start);
-    Token token(type, substr, "", 0, line);
+    Object nil;
+    Token token(type, substr, &nil, line);
     tokens.push_back(token);
 }
 
@@ -134,14 +136,16 @@ char Scanner::peekNext()
 void Scanner::addString(std::string str)
 {
     std::string substr = source.substr(start, current - start);
-    Token token(STRING, substr, str, 0, line);
+    Object objStr(str);
+    Token token(STRING, substr, &objStr, line);
     tokens.push_back(token);
 }
 
 void Scanner::addNumber(double num)
 {
     std::string substr = source.substr(start, current - start);
-    Token token(NUMBER, substr, "", num, line);
+    Object objNum(num);
+    Token token(NUMBER, substr, &objNum, line);
     tokens.push_back(token);
 }
 

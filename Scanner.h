@@ -14,6 +14,7 @@ private:
 public:
     Scanner(std::string source_);
     std::list<Token> scanTokens();
+private:
     bool isAtEnd();
     void scanToken();
     char advance();

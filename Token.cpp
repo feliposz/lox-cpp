@@ -18,27 +18,18 @@ static const char *TokenTypeNames[] = {
     "EOF_TOKEN",
 };
 
-Token::Token(TokenType type_, std::string lexeme_, std::string strLiteral_, double numLiteral_, int line_)
+Token::Token(TokenType type_, std::string lexeme_, Object *literal_, int line_)
 {
     type = type_;
     lexeme = lexeme_;
-    strLiteral = strLiteral_;
-    numLiteral = numLiteral_;
+    literal = *literal_;
     line = line_;
 }
 
 std::string Token::str()
 {
     std::ostringstream s;
-    s << TokenTypeNames[type] << " " << lexeme;
-    if (type == STRING)
-    {
-        s << " " << strLiteral;
-    }
-    else if (type == NUMBER)
-    {
-        s << " " << numLiteral;
-    }
+    s << TokenTypeNames[type] << " " << lexeme << " " << literal.str();
     return s.str();
 }
 
