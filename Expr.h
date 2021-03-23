@@ -2,98 +2,67 @@
 
 #include "Token.h"
 
-struct Binary;
-struct Grouping;
-struct Literal;
-struct Unary;
-
-template <typename R>
-struct Visitor
+enum ExprType
 {
-    R visitBinaryExpr(Binary *expr);
-    R visitGroupingExpr(Grouping *expr);
-    R visitLiteralExpr(Literal *expr);
-    R visitUnaryExpr(Unary *expr);
+    ExprType_Binary,
+    ExprType_Grouping,
+    ExprType_Literal,
+    ExprType_Unary,
 };
 
-template <typename R>
 struct Expr
 {
+    ExprType type;
 
-    Expr()
+    Expr(ExprType type)
     {
+        this->type = type;
     }
-
-    virtual R accept(Visitor<R> visitor);
 };
 
-template <typename R>
-struct Binary : public Expr<R>
+struct Binary : public Expr
 {
     Expr *left;
     Token *oper;
     Expr *right;
 
-    Binary(Expr *left, Token *oper, Expr *right)
+    Binary(Expr *left, Token *oper, Expr *right) : Expr(ExprType_Binary)
     {
         this->left = left;
         this->oper = oper;
         this->right = right;
     }
-
-    override accept(Visitor<R> visitor)
-    {
-        return visitor.visitBinaryExpr(this);
-    }
 };
 
-template <typename R>
-struct Grouping : public Expr<R>
+struct Grouping : public Expr
 {
     Expr *expression;
 
-    Grouping(Expr *expression)
+    Grouping(Expr *expression) : Expr(ExprType_Grouping)
     {
         this->expression = expression;
     }
-
-    override accept(Visitor<R> visitor)
-    {
-        return visitor.visitGroupingExpr(this);
-    }
 };
 
-template <typename R>
-struct Literal : public Expr<R>
+struct Literal : public Expr
 {
     Object *value;
 
-    Literal(Object *value)
+    Literal(Object *value) : Expr(ExprType_Literal)
     {
         this->value = value;
     }
-
-    override accept(Visitor<R> visitor)
-    {
-        return visitor.visitLiteralExpr(this);
-    }
 };
 
-template <typename R>
-struct Unary<R> : public Expr<R>
+struct Unary : public Expr
 {
     Token *oper;
     Expr *right;
 
-    Unary(Token *oper, Expr *right)
+    Unary(Token *oper, Expr *right) : Expr(ExprType_Unary)
     {
         this->oper = oper;
         this->right = right;
-    }
-
-    override accept(Visitor<R> visitor)
-    {
-        return visitor.visitUnaryExpr(this);
     }
 };
 

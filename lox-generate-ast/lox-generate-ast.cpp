@@ -23,25 +23,30 @@ void splitString(char splitChar, std::string &str, std::vector<std::string> &spl
     }
 }
 
-void defineType(std::ofstream &writer, const char *basename, std::string &className, std::string &fields)
+void defineBaseType(std::ofstream &writer, std::string &className)
 {
-    writer << "template <typename R>" << std::endl;
-    if (basename)
-    {
-        writer << "struct " << className << " : public " << basename << std::endl;
-    }
-    else
-    {
-        writer << "struct " << className << std::endl;
-    }
-        
-    std::vector<std::string> fieldVec;
-    splitString(',', fields, fieldVec);
-    
+    writer << "struct " << className << std::endl;
+    writer << "{" << std::endl;
+    writer << "    ExprType type;" << std::endl;
+    writer << std::endl;
+    writer << "    " << className << "(ExprType type)" << std::endl;;
+    writer << "    {" << std::endl;
+    writer << "        this->type = type;" << std::endl;
+    writer << "    }" << std::endl;
+    writer << "};" << std::endl << std::endl;
+}
+
+void defineType(std::ofstream &writer, const char *basename, std::string &className, std::string &fieldStr)
+{
+    std::vector<std::string> fields;
+
+    writer << "struct " << className << " : public " << basename << std::endl;
     writer << "{" << std::endl;
 
+    splitString(',', fieldStr, fields);
+
     // Members
-    for (auto &field : fieldVec)
+    for (auto &field : fields)
     {
         std::vector<std::string> parts;
         splitString(' ', field, parts);
@@ -52,7 +57,7 @@ void defineType(std::ofstream &writer, const char *basename, std::string &classN
     writer << std::endl;
     writer << "    " << className << "(";
     bool first = true;
-    for (auto &field : fieldVec)
+    for (auto &field : fields)
     {
         std::vector<std::string> parts;
         splitString(' ', field, parts);
@@ -63,11 +68,11 @@ void defineType(std::ofstream &writer, const char *basename, std::string &classN
         writer << parts[0] << " *" << parts[1];;
         first = false;
     }
-    writer << ")" << std::endl;
+    writer << ") : " << basename << "(ExprType_" << className << ")" << std::endl;
 
     // Constructor body
     writer << "    {" << std::endl;
-    for (auto &field : fieldVec)
+    for (auto &field : fields)
     {
         std::vector<std::string> parts;
         splitString(' ', field, parts);
@@ -75,51 +80,6 @@ void defineType(std::ofstream &writer, const char *basename, std::string &classN
     }
     writer << "    }" << std::endl;
 
-    // Accept method
-    if (basename)
-    {
-        writer << std::endl;
-        writer << "    override accept(Visitor<R> visitor)" << std::endl;
-        writer << "    {" << std::endl;
-        writer << "        return visitor.visit" << className << basename << "(this);" << std::endl;
-        writer << "    }" << std::endl;
-    }
-    else
-    {
-        writer << std::endl;
-        writer << "    virtual R accept(Visitor<R> visitor);" << std::endl;
-    }
-
-    writer << "};" << std::endl << std::endl;
-}
-
-void defineVisitor(std::ofstream &writer, std::string &baseName, std::vector<std::string> &types)
-{
-    std::string lowerBaseName;
-    for (auto c : baseName)
-    {
-        lowerBaseName.append(1, tolower(c));
-    }
-
-    // forward declarations
-    for (auto &type : types)
-    {
-        std::vector<std::string> parts;
-        splitString(':', type, parts);
-        writer << "struct " << parts[0] << ";" << std::endl;
-    }
-
-    // "abstract" visitor
-    writer << std::endl;
-    writer << "template <typename R>" << std::endl;
-    writer << "struct Visitor" << std::endl;
-    writer << "{" << std::endl;
-    for (auto &type : types)
-    {
-        std::vector<std::string> parts;
-        splitString(':', type, parts);
-        writer << "    R visit" << parts[0] << baseName << "(" << parts[0] << " *" << lowerBaseName << ");" << std::endl;
-    }
     writer << "};" << std::endl << std::endl;
 }
 
@@ -133,10 +93,18 @@ void defineAst(const char *outputDir, const char *basename, std::vector<std::str
         writer << "#pragma once" << std::endl << std::endl;
         writer << "#include \"Token.h\"" << std::endl << std::endl;
         
+        writer << "enum ExprType" << std::endl;
+        writer << "{" << std::endl;
+        for (auto &type : types)
+        {
+            std::vector<std::string> parts;
+            splitString(':', type, parts);
+            writer << "    ExprType_" << parts[0] << "," << std::endl;
+        }
+        writer << "};" << std::endl << std::endl;
+
         std::string baseClassName(basename);
-        std::string baseFields;
-        defineVisitor(writer, baseClassName, types);
-        defineType(writer, 0, baseClassName, baseFields);
+        defineBaseType(writer, baseClassName);
 
         for (auto &type : types)
         {
