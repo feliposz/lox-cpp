@@ -41,5 +41,8 @@
     <ClInclude Include="TokenType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AstPrinter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

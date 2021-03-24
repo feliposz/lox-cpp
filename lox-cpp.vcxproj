@@ -153,6 +153,7 @@
     <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AstPrinter.h" />
     <ClInclude Include="Lox.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="Token.h" />

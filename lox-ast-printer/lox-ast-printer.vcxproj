@@ -115,11 +115,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Expr.h" />
-    <ClInclude Include="..\Token.h" />
-    <ClInclude Include="..\TokenType.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\Token.cpp" />
     <ClCompile Include="lox-ast-printer.cpp" />
   </ItemGroup>
