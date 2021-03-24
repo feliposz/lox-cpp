@@ -52,7 +52,6 @@ public:
     TokenType type;
     std::string lexeme;
     Object literal;
-    double numLiteral;
     int line;
 
     Token(TokenType type_, std::string lexeme_, Object *literal_, int line_);

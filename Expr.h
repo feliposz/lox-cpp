@@ -32,6 +32,13 @@ struct Binary : public Expr
         this->oper = oper;
         this->right = right;
     }
+
+    ~Binary()
+    {
+        delete left;
+        delete oper;
+        delete right;
+    }
 };
 
 struct Grouping : public Expr
@@ -42,6 +49,11 @@ struct Grouping : public Expr
     {
         this->expression = expression;
     }
+
+    ~Grouping()
+    {
+        delete expression;
+    }
 };
 
 struct Literal : public Expr
@@ -51,6 +63,11 @@ struct Literal : public Expr
     Literal(Object *value) : Expr(ExprType_Literal)
     {
         this->value = value;
+    }
+
+    ~Literal()
+    {
+        delete value;
     }
 };
 
@@ -63,6 +80,12 @@ struct Unary : public Expr
     {
         this->oper = oper;
         this->right = right;
+    }
+
+    ~Unary()
+    {
+        delete oper;
+        delete right;
     }
 };
 

@@ -7,7 +7,7 @@ Scanner::Scanner(std::string source_)
     source = source_;
 }
 
-std::list<Token> Scanner::scanTokens()
+std::vector<Token> Scanner::scanTokens()
 {
     while (!isAtEnd())
     {

@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 
     AstPrinter::print(expr);
 
-    // TODO: leaking memory... (use unique_ptr???)
+    delete expr;
 
     return EXIT_SUCCESS;
 }

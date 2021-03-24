@@ -80,6 +80,18 @@ void defineType(std::ofstream &writer, const char *basename, std::string &classN
     }
     writer << "    }" << std::endl;
 
+    // Destructor
+    writer << std::endl;
+    writer << "    ~" << className << "()" << std::endl;
+    writer << "    {" << std::endl;
+    for (auto &field : fields)
+    {
+        std::vector<std::string> parts;
+        splitString(' ', field, parts);
+        writer << "        delete " << parts[1] << ";" << std::endl;
+    }
+    writer << "    }" << std::endl;
+
     writer << "};" << std::endl << std::endl;
 }
 

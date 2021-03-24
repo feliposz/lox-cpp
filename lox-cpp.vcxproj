@@ -149,12 +149,15 @@
   <ItemGroup>
     <ClCompile Include="lox-cpp.cpp" />
     <ClCompile Include="Lox.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Scanner.cpp" />
     <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AstPrinter.h" />
+    <ClInclude Include="Expr.h" />
     <ClInclude Include="Lox.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="TokenType.h" />

@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <list>
+#include <vector>
 #include "Token.h"
 
 class Scanner
@@ -10,10 +10,10 @@ private:
     unsigned int current = 0;
     unsigned int line = 1;
     std::string source;
-    std::list<Token> tokens;
+    std::vector<Token> tokens;
 public:
     Scanner(std::string source_);
-    std::list<Token> scanTokens();
+    std::vector<Token> scanTokens();
 private:
     bool isAtEnd();
     void scanToken();
