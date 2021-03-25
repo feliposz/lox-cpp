@@ -18,6 +18,10 @@ struct Expr
     {
         this->type = type;
     }
+
+    virtual ~Expr()
+    {
+    }
 };
 
 struct Binary : public Expr

@@ -33,6 +33,10 @@ void defineBaseType(std::ofstream &writer, std::string &className)
     writer << "    {" << std::endl;
     writer << "        this->type = type;" << std::endl;
     writer << "    }" << std::endl;
+    writer << std::endl;
+    writer << "    virtual ~" << className << "()" << std::endl;;
+    writer << "    {" << std::endl;
+    writer << "    }" << std::endl;
     writer << "};" << std::endl << std::endl;
 }
 

@@ -8,14 +8,13 @@ Parser::Parser(std::vector<Token> tokens)
 
 Expr * Parser::parse()
 {
-    try
+    Expr *expr = expression();
+    if (Lox::hadError)
     {
-        return expression();
-    }
-    catch (ParseError& e)
-    {
-        return nullptr;
-    }
+        delete expr;
+        expr = nullptr;
+    }    
+    return expr;
 }
 
 Expr * Parser::expression()
@@ -117,8 +116,15 @@ Expr * Parser::primary()
     else if (match(LEFT_PAREN))
     {
         Expr *expr = expression();
-        consume(RIGHT_PAREN, "Expected ')' after expression.");
-        return new Grouping(expr);
+        if (consume(RIGHT_PAREN, "Expected ')' after expression."))
+        {
+            return new Grouping(expr);
+        }
+        else
+        {
+            // Error ocurred, allow to recover
+            return expr;
+        }
     }
     
 }
@@ -166,17 +172,18 @@ bool Parser::isAtEnd()
     return peek().type == EOF;
 }
 
-Token Parser::consume(TokenType type, std::string message)
+bool Parser::consume(TokenType type, std::string message)
 {
     if (check(type))
     {
-        return advance();
+        advance();
+        return true;
     }
-    throw error(peek(), message);
+    error(peek(), message);
+    return false;
 }
 
-ParseError *Parser::error(Token token, std::string message)
+void Parser::error(Token token, std::string message)
 {
     Lox::error(token, message);
-    return new ParseError();
 }

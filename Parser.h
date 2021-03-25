@@ -26,8 +26,8 @@ private:
     Token peek();
     Token previous();
     bool isAtEnd();
-    Token consume(TokenType type, std::string message);
-    ParseError *error(Token token, std::string message);
+    bool consume(TokenType type, std::string message);
+    void error(Token token, std::string message);
 public:
     Parser(std::vector<Token> tokens);
     Expr *parse();

@@ -78,8 +78,9 @@ void Lox::error(Token token, std::string message)
     }
     else
     {
-        // TODO: format => at 'lexeme'
-        report(token.line, token.lexeme, message);
+        std::stringstream ss;
+        ss << " at '" << token.lexeme << "'";
+        report(token.line, ss.str(), message);
     }
 }
 
