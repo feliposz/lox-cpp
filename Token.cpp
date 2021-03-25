@@ -4,6 +4,7 @@
 static const char *TokenTypeNames[] = {
     "LEFT_PAREN", "RIGHT_PAREN", "LEFT_BRACE", "RIGHT_BRACE",
     "COMMA", "DOT", "MINUS", "PLUS", "SEMICOLON", "SLASH", "STAR",
+    "QUESTION", "COLON",
 
     "BANG", "BANG_EQUAL",
     "EQUAL", "EQUAL_EQUAL",

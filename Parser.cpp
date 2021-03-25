@@ -11,7 +11,10 @@ Expr * Parser::parse()
     Expr *expr = expression();
     if (Lox::hadError)
     {
-        delete expr;
+        if (expr)
+        {
+            delete expr;
+        }
         expr = nullptr;
     }    
     return expr;
@@ -19,7 +22,41 @@ Expr * Parser::parse()
 
 Expr * Parser::expression()
 {
-    return equality();
+    Expr *expr = conditional();
+
+    while (match(COMMA))
+    {
+        Token *oper = new Token(previous());
+        Expr *right = conditional();
+        expr = new Binary(expr, oper, right);
+    }
+
+    return expr;
+}
+
+Expr * Parser::conditional()
+{
+    Expr *expr = equality();
+
+    if (match(QUESTION))
+    {
+        Token *question = new Token(previous());
+        Expr *second = conditional();
+        if (match(COLON))
+        {
+            Token *colon = new Token(previous());
+            Expr *third = conditional();
+            expr = new Ternary(expr, question, second, colon, third);
+        }
+        else
+        {
+            error(peek(), "Expected ':'");
+            delete question;
+            delete second;
+        }
+    }
+
+    return expr;
 }
 
 Expr * Parser::equality()
@@ -80,11 +117,19 @@ Expr * Parser::factor()
 
 Expr * Parser::unary()
 {
-    if (match(MINUS) || match(BANG))
+    if (match(MINUS) || match(BANG) || match(STAR) || match(SLASH) || match(PLUS))
     {
-        Token *oper = new Token(previous());
-        Expr *right = unary();
-        return new Unary(oper, right);
+        if ((previous().type == MINUS) || (previous().type == BANG))
+        {
+            Token *oper = new Token(previous());
+            Expr *right = unary();
+            return new Unary(oper, right);
+        }
+        else
+        {
+            error(previous(), "Missing left operand.");
+            return nullptr;
+        }
     }
     return primary();
 }
@@ -126,7 +171,8 @@ Expr * Parser::primary()
             return expr;
         }
     }
-    
+    error(peek(), "Expected expression.");
+    return nullptr;
 }
 
 bool Parser::match(TokenType type)
@@ -186,4 +232,32 @@ bool Parser::consume(TokenType type, std::string message)
 void Parser::error(Token token, std::string message)
 {
     Lox::error(token, message);
+}
+
+void Parser::synchronize()
+{
+    advance();
+
+    while (!isAtEnd())
+    {
+        if (previous().type == SEMICOLON)
+        {
+            return;
+        }
+
+        switch (peek().type)
+        {
+            case CLASS:
+            case FUN:
+            case VAR:
+            case FOR:
+            case IF:
+            case WHILE:
+            case PRINT:
+            case RETURN:
+                return;
+        }
+
+        advance();
+    }
 }

@@ -8,15 +8,21 @@ namespace AstPrinter
 {
     std::string visit(Expr *expr);
 
-    std::string parenthesize(std::string name, Expr *expr1 = 0, Expr *expr2 = 0, Expr *expr3 = 0)
+    std::string parenthesize(std::string name, Expr *expr1 = 0, Expr *expr2 = 0, Expr *expr3 = 0, Expr *expr4 = 0)
     {
         std::stringstream ss;
         ss << "(" << name;
         if (expr1) ss << " " << visit(expr1);
         if (expr2) ss << " " << visit(expr2);
         if (expr3) ss << " " << visit(expr3);
+        if (expr4) ss << " " << visit(expr4);
         ss << ")";
         return ss.str();
+    }
+
+    std::string visitTernary(Ternary *expr)
+    {
+        return parenthesize(expr->oper1->lexeme + expr->oper2->lexeme, expr->first, expr->second, expr->third);
     }
 
     std::string visitBinary(Binary *expr)
@@ -43,6 +49,7 @@ namespace AstPrinter
     {
         switch (expr->type)
         {
+            case ExprType_Ternary: return visitTernary((Ternary *)expr);
             case ExprType_Binary: return visitBinary((Binary *)expr);
             case ExprType_Grouping: return visitGrouping((Grouping *)expr);
             case ExprType_Literal: return visitLiteral((Literal *)expr);

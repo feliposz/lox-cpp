@@ -72,7 +72,7 @@ void Lox::error(int line, std::string message)
 
 void Lox::error(Token token, std::string message)
 {
-    if (token.type == EOF)
+    if (token.type == EOF_TOKEN)
     {
         report(token.line, " at end", message);
     }
@@ -86,6 +86,6 @@ void Lox::error(Token token, std::string message)
 
 void Lox::report(int line, std::string where, std::string message)
 {
-    std::cerr << "[line " << line << "] Error " << where << ": " << message << std::endl;
+    std::cerr << "[line " << line << "] Error" << where << ": " << message << std::endl;
     hadError = true;
 }

@@ -146,6 +146,7 @@ int main(int argc, char *argv[])
     }
 
     std::vector<std::string> types = {
+        "Ternary  : Expr first, Token oper1, Expr second, Token oper2, Expr third",
         "Binary   : Expr left, Token oper, Expr right",
         "Grouping : Expr expression",
         "Literal  : Object value",

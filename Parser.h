@@ -14,6 +14,7 @@ private:
     unsigned int current = 0;
     std::vector<Token> tokens;
     Expr *expression();
+    Expr *conditional();
     Expr *equality();
     Expr *comparison();
     Expr *term();
@@ -28,6 +29,7 @@ private:
     bool isAtEnd();
     bool consume(TokenType type, std::string message);
     void error(Token token, std::string message);
+    void synchronize();
 public:
     Parser(std::vector<Token> tokens);
     Expr *parse();

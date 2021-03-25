@@ -4,6 +4,7 @@
 
 enum ExprType
 {
+    ExprType_Ternary,
     ExprType_Binary,
     ExprType_Grouping,
     ExprType_Literal,
@@ -21,6 +22,33 @@ struct Expr
 
     virtual ~Expr()
     {
+    }
+};
+
+struct Ternary : public Expr
+{
+    Expr *first;
+    Token *oper1;
+    Expr *second;
+    Token *oper2;
+    Expr *third;
+
+    Ternary(Expr *first, Token *oper1, Expr *second, Token *oper2, Expr *third) : Expr(ExprType_Ternary)
+    {
+        this->first = first;
+        this->oper1 = oper1;
+        this->second = second;
+        this->oper2 = oper2;
+        this->third = third;
+    }
+
+    ~Ternary()
+    {
+        delete first;
+        delete oper1;
+        delete second;
+        delete oper2;
+        delete third;
     }
 };
 
