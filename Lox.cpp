@@ -14,7 +14,7 @@ bool Lox::hadRuntimeError = false;
 void Lox::runFile(char *filename)
 {
     std::ifstream infile(filename, std::ios::in | std::ios::binary);
-    if (!infile.bad())
+    if (!infile.bad() && infile.is_open())
     {
         std::ostringstream content;
         content << infile.rdbuf();
@@ -28,6 +28,10 @@ void Lox::runFile(char *filename)
         {
             exit(70);
         }
+    }
+    else
+    {
+        std::cerr << "Could not open file " << filename << std::endl;
     }
 }
 
@@ -57,12 +61,19 @@ void Lox::run(std::string source)
 #if 1
     Parser parser(tokens);
 
-    Expr *expr = parser.parse();
-    if (expr)
+    for (;;)
     {
-        //AstPrinter::print(expr);
-        Interpreter::interpret(expr);
-        delete expr;
+        Expr *expr = parser.parse();
+        if (expr)
+        {
+            //AstPrinter::print(expr);
+            Interpreter::interpret(expr);
+            delete expr;
+        }
+        else
+        {
+            break;
+        }
     }
 #else
     for (auto &token : tokens)

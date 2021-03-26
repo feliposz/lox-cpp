@@ -171,6 +171,10 @@ Expr * Parser::primary()
             return expr;
         }
     }
+    else if (isAtEnd())
+    {
+        return nullptr;
+    }
     error(peek(), "Expected expression.");
     return nullptr;
 }
@@ -215,7 +219,7 @@ Token Parser::previous()
 
 bool Parser::isAtEnd()
 {
-    return peek().type == EOF;
+    return peek().type == EOF_TOKEN;
 }
 
 bool Parser::consume(TokenType type, std::string message)
