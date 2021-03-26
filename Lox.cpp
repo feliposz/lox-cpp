@@ -6,8 +6,10 @@
 #include "Scanner.h"
 #include "AstPrinter.h"
 #include "Parser.h"
+#include "Interpreter.h"
 
 bool Lox::hadError = false;
+bool Lox::hadRuntimeError = false;
 
 void Lox::runFile(char *filename)
 {
@@ -21,6 +23,10 @@ void Lox::runFile(char *filename)
         if (hadError)
         {
             exit(65);
+        }
+        if (hadRuntimeError)
+        {
+            exit(70);
         }
     }
 }
@@ -54,7 +60,8 @@ void Lox::run(std::string source)
     Expr *expr = parser.parse();
     if (expr)
     {
-        AstPrinter::print(expr);
+        //AstPrinter::print(expr);
+        Interpreter::interpret(expr);
         delete expr;
     }
 #else
@@ -82,6 +89,12 @@ void Lox::error(Token token, std::string message)
         ss << " at '" << token.lexeme << "'";
         report(token.line, ss.str(), message);
     }
+}
+
+void Lox::runtimeError(Token token, std::string message)
+{
+    std::cerr << message << std::endl << "[line " << token.line << "]" << std::endl;
+    hadRuntimeError = true;
 }
 
 void Lox::report(int line, std::string where, std::string message)

@@ -60,7 +60,7 @@ namespace AstPrinter
 
     void print(Expr *expr)
     {
-        std::cout << visit(expr) << std::endl;
+        std::cout << "::AstPrinter:: " <<  visit(expr) << std::endl;
     }
 
 };

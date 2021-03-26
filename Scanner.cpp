@@ -216,7 +216,7 @@ static std::unordered_map<std::string, TokenType> keywords({
     { "and", AND },
     { "class", CLASS },
     { "else", ELSE },
-    { "false", FALSE },
+    { "false", FALSE_TOKEN },
     { "for", FOR },
     { "fun", FUN },
     { "if", IF },
@@ -226,7 +226,7 @@ static std::unordered_map<std::string, TokenType> keywords({
     { "return", RETURN },
     { "super", SUPER },
     { "this", THIS },
-    { "true", TRUE },
+    { "true", TRUE_TOKEN },
     { "var", VAR },
     { "while", WHILE }
 });

@@ -136,11 +136,11 @@ Expr * Parser::unary()
 
 Expr * Parser::primary()
 {
-    if (match(TRUE))
+    if (match(TRUE_TOKEN))
     {
         return new Literal(new Object(true));
     }
-    else if (match(FALSE))
+    else if (match(FALSE_TOKEN))
     {
         return new Literal(new Object(false));
     }

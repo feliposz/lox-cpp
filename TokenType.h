@@ -17,8 +17,8 @@ enum TokenType
     IDENTIFIER, STRING, NUMBER,
 
     // Keywords: and class else false fun for if nil or print return super this true var while
-    AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
-    PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+    AND, CLASS, ELSE, FALSE_TOKEN, FUN, FOR, IF, NIL, OR,
+    PRINT, RETURN, SUPER, THIS, TRUE_TOKEN, VAR, WHILE,
 
     EOF_TOKEN,
 };
