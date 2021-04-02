@@ -157,7 +157,8 @@ int main(int argc, char *argv[])
         "Binary   : Expr left, Token oper, Expr right",
         "Grouping : Expr expression",
         "Literal  : Object value",
-        "Unary    : Token oper, Expr right"
+        "Unary    : Token oper, Expr right",
+        "Variable : Token name",
     };
     std::vector<std::string> exprIncludes = { "Token" };
     defineAst(outputDir, "Expr", exprTypes, exprIncludes);
@@ -165,6 +166,7 @@ int main(int argc, char *argv[])
     std::vector<std::string> stmtTypes = {
         "Expression : Expr expression",
         "Print : Expr expression",
+        "Var : Token name, Expr initializer",
     };
     std::vector<std::string> stmtIncludes = { "Expr" };
     defineAst(outputDir, "Stmt", stmtTypes, stmtIncludes);

@@ -9,6 +9,7 @@ enum ExprType
     ExprType_Grouping,
     ExprType_Literal,
     ExprType_Unary,
+    ExprType_Variable,
 };
 
 struct Expr
@@ -118,6 +119,21 @@ struct Unary : public Expr
     {
         delete oper;
         delete right;
+    }
+};
+
+struct Variable : public Expr
+{
+    Token *name;
+
+    Variable(Token *name) : Expr(ExprType_Variable)
+    {
+        this->name = name;
+    }
+
+    ~Variable()
+    {
+        delete name;
     }
 };
 

@@ -14,6 +14,8 @@ class Parser
 private:
     unsigned int current = 0;
     std::vector<Token> tokens;
+    Stmt *declaration();
+    Stmt *varDeclaration();
     Stmt *statement();
     Print *printStatement();
     Expression *expressionStatement();

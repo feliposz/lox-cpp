@@ -11,9 +11,10 @@ std::vector<Stmt *> Parser::parse()
     std::vector<Stmt *> result;
     while (!isAtEnd())
     {
-        Stmt *stmt  = statement();
+        Stmt *stmt  = declaration();
         if (Lox::hadError)
         {
+            synchronize();
             if (stmt)
             {
                 delete stmt;
@@ -27,6 +28,35 @@ std::vector<Stmt *> Parser::parse()
         }
     }
     return result;
+}
+
+Stmt * Parser::declaration()
+{
+    if (match(VAR))
+    {
+        return varDeclaration();
+    }
+    return statement();
+}
+
+Stmt * Parser::varDeclaration()
+{
+    if (consume(IDENTIFIER, "Expect variable name."))
+    {
+        Token *name = new Token(previous());
+
+        Expr *initializer = nullptr;
+        if (match(EQUAL))
+        {
+            initializer = expression();
+        }
+
+        if (consume(SEMICOLON, "Expect ';' after variable declaration."))
+        {
+            return new Var(name, initializer);
+        }
+    }
+    return nullptr;
 }
 
 Stmt * Parser::statement()
@@ -216,6 +246,10 @@ Expr * Parser::primary()
             // Error ocurred, allow to recover
             return expr;
         }
+    }
+    else if (match(IDENTIFIER))
+    {
+        return new Variable(new Token(previous()));
     }
     else if (isAtEnd())
     {

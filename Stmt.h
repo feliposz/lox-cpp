@@ -6,6 +6,7 @@ enum StmtType
 {
     StmtType_Expression,
     StmtType_Print,
+    StmtType_Var,
 };
 
 struct Stmt
@@ -49,6 +50,24 @@ struct Print : public Stmt
     ~Print()
     {
         delete expression;
+    }
+};
+
+struct Var : public Stmt
+{
+    Token *name;
+    Expr *initializer;
+
+    Var(Token *name, Expr *initializer) : Stmt(StmtType_Var)
+    {
+        this->name = name;
+        this->initializer = initializer;
+    }
+
+    ~Var()
+    {
+        delete name;
+        delete initializer;
     }
 };
 

@@ -3,9 +3,12 @@
 #include <string>
 #include "Lox.h"
 #include "Expr.h"
+#include "Environment.h"
 
 namespace Interpreter
 {
+    Environment environment;
+
     Object evaluate(Expr *expr);
 
     void runtimeError(Token oper, std::string message)
@@ -269,6 +272,11 @@ namespace Interpreter
 
     }
 
+    Object visitVariable(Variable *expr)
+    {
+        return environment.get(expr->name);
+    }
+
     Object evaluate(Expr *expr)
     {
         if (expr)
@@ -280,6 +288,7 @@ namespace Interpreter
                 case ExprType_Grouping: return visitGrouping((Grouping *)expr);
                 case ExprType_Literal: return visitLiteral((Literal *)expr);
                 case ExprType_Unary: return visitUnary((Unary *)expr);
+                case ExprType_Variable: return visitVariable((Variable *)expr);
             }
         }
         Lox::error(EOF_TOKEN, "Invalid expression type.");
@@ -301,6 +310,16 @@ namespace Interpreter
         evaluate(stmt->expression);
     }
 
+    void visitVar(Var *stmt)
+    {
+        Object value;
+        if (stmt->initializer)
+        {
+            value = evaluate(stmt->initializer);
+        }
+        environment.define(stmt->name->lexeme, value);
+    }
+
     void execute(Stmt *stmt)
     {
         if (stmt)
@@ -309,6 +328,7 @@ namespace Interpreter
             {
                 case StmtType_Print: visitPrint((Print *)stmt); break;
                 case StmtType_Expression: visitExpression((Expression *)stmt); break;
+                case StmtType_Var: visitVar((Var *)stmt); break;
                 default:
                     Lox::error(EOF_TOKEN, "Invalid statement type.");
             }
