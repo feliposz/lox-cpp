@@ -6,18 +6,64 @@ Parser::Parser(std::vector<Token> tokens)
     this->tokens = tokens;
 }
 
-Expr * Parser::parse()
+std::vector<Stmt *> Parser::parse()
+{
+    std::vector<Stmt *> result;
+    while (!isAtEnd())
+    {
+        Stmt *stmt  = statement();
+        if (Lox::hadError)
+        {
+            if (stmt)
+            {
+                delete stmt;
+            }
+            stmt = nullptr;
+            break;
+        }
+        else
+        {
+            result.push_back(stmt);
+        }
+    }
+    return result;
+}
+
+Stmt * Parser::statement()
+{
+    if (match(PRINT))
+    {
+        return printStatement();
+    }
+    return expressionStatement();
+}
+
+Print * Parser::printStatement()
 {
     Expr *expr = expression();
-    if (Lox::hadError)
+    if (consume(SEMICOLON, "Expected ';' after value."))
     {
-        if (expr)
-        {
-            delete expr;
-        }
-        expr = nullptr;
-    }    
-    return expr;
+        return new Print(expr);
+    }
+    else
+    {
+        delete expr;
+        return nullptr;
+    }
+}
+
+Expression * Parser::expressionStatement()
+{
+    Expr *expr = expression();
+    if (consume(SEMICOLON, "Expected ';' after value."))
+    {
+        return new Expression(expr);
+    }
+    else
+    {
+        delete expr;
+        return nullptr;
+    }
 }
 
 Expr * Parser::expression()

@@ -57,30 +57,13 @@ void Lox::run(std::string source)
 {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scanTokens();
-
-#if 1
     Parser parser(tokens);
-
-    for (;;)
+    std::vector<Stmt *> statements = parser.parse();
+    Interpreter::interpret(statements);
+    for (auto &statement : statements)
     {
-        Expr *expr = parser.parse();
-        if (expr)
-        {
-            //AstPrinter::print(expr);
-            Interpreter::interpret(expr);
-            delete expr;
-        }
-        else
-        {
-            break;
-        }
+        delete statement;
     }
-#else
-    for (auto &token : tokens)
-    {
-        std::cout << token << std::endl;
-    }
-#endif
 }
 
 void Lox::error(int line, std::string message)

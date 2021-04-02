@@ -3,6 +3,7 @@
 #include <vector>
 #include "Token.h"
 #include "Expr.h"
+#include "Stmt.h"
 
 class ParseError : public std::exception
 {
@@ -13,6 +14,9 @@ class Parser
 private:
     unsigned int current = 0;
     std::vector<Token> tokens;
+    Stmt *statement();
+    Print *printStatement();
+    Expression *expressionStatement();
     Expr *expression();
     Expr *conditional();
     Expr *equality();
@@ -32,5 +36,5 @@ private:
     void synchronize();
 public:
     Parser(std::vector<Token> tokens);
-    Expr *parse();
+    std::vector<Stmt *> parse();
 };

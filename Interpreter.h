@@ -106,6 +106,10 @@ namespace Interpreter
             case SLASH:
             {
                 checkNumberOperands(*expr->oper, left, right);
+                if (right.numLiteral == 0)
+                {
+                    runtimeError(*expr->oper, "Divide by zero.");
+                }
                 Object value(left.numLiteral / right.numLiteral);
                 return value;
             }
@@ -122,9 +126,19 @@ namespace Interpreter
                     Object value(left.strLiteral + right.strLiteral);
                     return value;
                 }
+                else if (left.type == TYPE_STRING)
+                {
+                    Object value(left.strLiteral + right.str());
+                    return value;
+                }
+                else if (right.type == TYPE_STRING)
+                {
+                    Object value(left.str() + right.strLiteral);
+                    return value;
+                }
                 else
                 {
-                    runtimeError(*expr->oper, "Operands must be both strings or both numbers.");
+                    runtimeError(*expr->oper, "Operands must be both numbers or at least one should be a string.");
                 }
             }
 
@@ -142,37 +156,81 @@ namespace Interpreter
 
             case LESS:
             {
-                checkNumberOperands(*expr->oper, left, right);
-                Object value(left.numLiteral < right.numLiteral);
-                return value;
+                if (left.type == TYPE_NUMBER && right.type == TYPE_NUMBER)
+                {
+                    Object value(left.numLiteral < right.numLiteral);
+                    return value;
+                }
+                else if (left.type == TYPE_STRING && right.type == TYPE_STRING)
+                {
+                    Object value(left.strLiteral < right.strLiteral);
+                    return value;
+                }
+                else
+                {
+                    runtimeError(*expr->oper, "Operands must be both strings or both numbers.");
+                }
             }
 
             case GREATER:
             {
-                checkNumberOperands(*expr->oper, left, right);
-                Object value(left.numLiteral > right.numLiteral);
-                return value;
+                if (left.type == TYPE_NUMBER && right.type == TYPE_NUMBER)
+                {
+                    Object value(left.numLiteral > right.numLiteral);
+                    return value;
+                }
+                else if (left.type == TYPE_STRING && right.type == TYPE_STRING)
+                {
+                    Object value(left.strLiteral > right.strLiteral);
+                    return value;
+                }
+                else
+                {
+                    runtimeError(*expr->oper, "Operands must be both strings or both numbers.");
+                }
             }
 
             case LESS_EQUAL:
             {
-                checkNumberOperands(*expr->oper, left, right);
-                Object value(left.numLiteral <= right.numLiteral);
-                return value;
+                if (left.type == TYPE_NUMBER && right.type == TYPE_NUMBER)
+                {
+                    Object value(left.numLiteral <= right.numLiteral);
+                    return value;
+                }
+                else if (left.type == TYPE_STRING && right.type == TYPE_STRING)
+                {
+                    Object value(left.strLiteral <= right.strLiteral);
+                    return value;
+                }
+                else
+                {
+                    runtimeError(*expr->oper, "Operands must be both strings or both numbers.");
+                }
             }
 
             case GREATER_EQUAL:
             {
-                checkNumberOperands(*expr->oper, left, right);
-                Object value(left.numLiteral >= right.numLiteral);
-                return value;
+                if (left.type == TYPE_NUMBER && right.type == TYPE_NUMBER)
+                {
+                    Object value(left.numLiteral >= right.numLiteral);
+                    return value;
+                }
+                else if (left.type == TYPE_STRING && right.type == TYPE_STRING)
+                {
+                    Object value(left.strLiteral >= right.strLiteral);
+                    return value;
+                }
+                else
+                {
+                    runtimeError(*expr->oper, "Operands must be both strings or both numbers.");
+                }
             }
 
             default:
                 runtimeError(*expr->oper, "Invalid binary operator.");
         }
 
-        return left;
+        return nullptr;
     }
 
     Object visitGrouping(Grouping *expr)
@@ -213,30 +271,67 @@ namespace Interpreter
 
     Object evaluate(Expr *expr)
     {
-        switch (expr->type)
+        if (expr)
         {
-            case ExprType_Ternary: return visitTernary((Ternary *)expr);
-            case ExprType_Binary: return visitBinary((Binary *)expr);
-            case ExprType_Grouping: return visitGrouping((Grouping *)expr);
-            case ExprType_Literal: return visitLiteral((Literal *)expr);
-            case ExprType_Unary: return visitUnary((Unary *)expr);
+            switch (expr->type)
+            {
+                case ExprType_Ternary: return visitTernary((Ternary *)expr);
+                case ExprType_Binary: return visitBinary((Binary *)expr);
+                case ExprType_Grouping: return visitGrouping((Grouping *)expr);
+                case ExprType_Literal: return visitLiteral((Literal *)expr);
+                case ExprType_Unary: return visitUnary((Unary *)expr);
+            }
         }
         Lox::error(EOF_TOKEN, "Invalid expression type.");
         Object nil;
         return nil;
     }
 
-    void interpret(Expr *expr)
+    void visitPrint(Print *stmt)
     {
-        Object value = evaluate(expr);
-        if (Lox::hadRuntimeError)
-        {
-            Lox::hadRuntimeError = false;
-        }
-        else
+        Object value = evaluate(stmt->expression);
+        if (!Lox::hadRuntimeError)
         {
             std::cout << value.str() << std::endl;
         }
     }
 
+    void visitExpression(Expression *stmt)
+    {
+        evaluate(stmt->expression);
+    }
+
+    void execute(Stmt *stmt)
+    {
+        if (stmt)
+        {
+            switch (stmt->type)
+            {
+                case StmtType_Print: visitPrint((Print *)stmt); break;
+                case StmtType_Expression: visitExpression((Expression *)stmt); break;
+                default:
+                    Lox::error(EOF_TOKEN, "Invalid statement type.");
+            }
+        }        
+    }
+
+    void interpret(std::vector<Stmt *> statements)
+    {
+        for (auto &statement : statements)
+        {
+            if (statement)
+            {
+                execute(statement);
+            }
+            if (Lox::hadRuntimeError)
+            {
+                Lox::hadRuntimeError = false;
+                break;
+            }
+            else if (Lox::hadError)
+            {
+                break;
+            }
+        }
+    }
 };

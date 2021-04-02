@@ -27,9 +27,9 @@ void defineBaseType(std::ofstream &writer, std::string &className)
 {
     writer << "struct " << className << std::endl;
     writer << "{" << std::endl;
-    writer << "    ExprType type;" << std::endl;
+    writer << "    " << className << "Type type;" << std::endl;
     writer << std::endl;
-    writer << "    " << className << "(ExprType type)" << std::endl;;
+    writer << "    " << className << "(" << className << "Type type)" << std::endl;;
     writer << "    {" << std::endl;
     writer << "        this->type = type;" << std::endl;
     writer << "    }" << std::endl;
@@ -72,7 +72,7 @@ void defineType(std::ofstream &writer, const char *basename, std::string &classN
         writer << parts[0] << " *" << parts[1];;
         first = false;
     }
-    writer << ") : " << basename << "(ExprType_" << className << ")" << std::endl;
+    writer << ") : " << basename << "(" << basename << "Type_" << className << ")" << std::endl;
 
     // Constructor body
     writer << "    {" << std::endl;
@@ -99,7 +99,7 @@ void defineType(std::ofstream &writer, const char *basename, std::string &classN
     writer << "};" << std::endl << std::endl;
 }
 
-void defineAst(const char *outputDir, const char *basename, std::vector<std::string> &types)
+void defineAst(const char *outputDir, const char *basename, std::vector<std::string> &types, std::vector<std::string> &includes)
 {
     std::ostringstream path; // TODO: change to ostringstream?
     path << outputDir << "/" << basename << ".h" << std::ends;
@@ -107,15 +107,20 @@ void defineAst(const char *outputDir, const char *basename, std::vector<std::str
     if (!writer.bad())
     {
         writer << "#pragma once" << std::endl << std::endl;
-        writer << "#include \"Token.h\"" << std::endl << std::endl;
+
+        for (auto &include : includes)
+        {
+            writer << "#include \"" << include << ".h\"" << std::endl;
+        }
         
-        writer << "enum ExprType" << std::endl;
+        writer << std::endl;
+        writer << "enum " << basename << "Type" << std::endl;
         writer << "{" << std::endl;
         for (auto &type : types)
         {
             std::vector<std::string> parts;
             splitString(':', type, parts);
-            writer << "    ExprType_" << parts[0] << "," << std::endl;
+            writer << "    " << basename << "Type_" << parts[0] << "," << std::endl;
         }
         writer << "};" << std::endl << std::endl;
 
@@ -145,15 +150,24 @@ int main(int argc, char *argv[])
         return EXIT_USAGE;
     }
 
-    std::vector<std::string> types = {
+    const char *outputDir = argv[1];
+
+    std::vector<std::string> exprTypes = {
         "Ternary  : Expr first, Token oper1, Expr second, Token oper2, Expr third",
         "Binary   : Expr left, Token oper, Expr right",
         "Grouping : Expr expression",
         "Literal  : Object value",
         "Unary    : Token oper, Expr right"
     };
-    const char *outputDir = argv[1];
-    defineAst(outputDir, "Expr", types);
+    std::vector<std::string> exprIncludes = { "Token" };
+    defineAst(outputDir, "Expr", exprTypes, exprIncludes);
+
+    std::vector<std::string> stmtTypes = {
+        "Expression : Expr expression",
+        "Print : Expr expression",
+    };
+    std::vector<std::string> stmtIncludes = { "Expr" };
+    defineAst(outputDir, "Stmt", stmtTypes, stmtIncludes);
 
     return EXIT_SUCCESS;
 }
