@@ -4,6 +4,7 @@
 
 enum ExprType
 {
+    ExprType_Assign,
     ExprType_Ternary,
     ExprType_Binary,
     ExprType_Grouping,
@@ -23,6 +24,24 @@ struct Expr
 
     virtual ~Expr()
     {
+    }
+};
+
+struct Assign : public Expr
+{
+    Token *name;
+    Expr *value;
+
+    Assign(Token *name, Expr *value) : Expr(ExprType_Assign)
+    {
+        this->name = name;
+        this->value = value;
+    }
+
+    ~Assign()
+    {
+        delete name;
+        delete value;
     }
 };
 

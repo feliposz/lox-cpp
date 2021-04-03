@@ -1,13 +1,8 @@
 #pragma once
-#include <stdexcept>
 #include <vector>
 #include "Token.h"
 #include "Expr.h"
 #include "Stmt.h"
-
-class ParseError : public std::exception
-{
-};
 
 class Parser
 {
@@ -20,6 +15,7 @@ private:
     Print *printStatement();
     Expression *expressionStatement();
     Expr *expression();
+    Expr *assignment();
     Expr *conditional();
     Expr *equality();
     Expr *comparison();

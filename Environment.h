@@ -10,21 +10,36 @@ private:
 
 public:
 
-    void define(std::string name, Object value)
+    void define(Token *name, Object value)
     {
-        values.emplace(name, value);
+        // TODO: check redefinition?
+        values.emplace(name->lexeme, value);
     }
 
-    Object get(Token *identifier)
+    void assign(Token *name, Object value)
     {
-        auto it = values.find(identifier->lexeme);
+        auto it = values.find(name->lexeme);
+
+        if (it != values.end())
+        {
+            it->second = value;
+        }
+        else
+        {
+            Lox::runtimeError(*name, "Undefined variable '" + name->lexeme + "'");
+        }        
+    }
+
+    Object get(Token *name)
+    {
+        auto it = values.find(name->lexeme);
 
         if (it != values.end())
         {
             return it->second;
         }
 
-        Lox::runtimeError(*identifier, "Undeclared identifier.");
+        Lox::runtimeError(*name, "Undefined variable '" + name->lexeme + "'");
         Object nil;
         return nil;
     }

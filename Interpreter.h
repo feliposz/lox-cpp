@@ -43,6 +43,8 @@ namespace Interpreter
             case TYPE_NUMBER: return a.numLiteral == b.numLiteral;
             case TYPE_STRING: return a.strLiteral == b.strLiteral;
         }
+
+        return false;
     }
 
     bool checkNumberOperand(Token oper, Object value)
@@ -69,6 +71,13 @@ namespace Interpreter
             runtimeError(oper, "Operands must be numbers.");
             return false;
         }
+    }
+
+    Object visitAssign(Assign *expr)
+    {
+        Object value = evaluate(expr->value);
+        environment.assign(expr->name, value);
+        return value;
     }
 
     Object visitTernary(Ternary *expr)
@@ -270,6 +279,7 @@ namespace Interpreter
                 runtimeError(*expr->oper, "Invalid unary operator.");
         }
 
+        return right;
     }
 
     Object visitVariable(Variable *expr)
@@ -283,6 +293,7 @@ namespace Interpreter
         {
             switch (expr->type)
             {
+                case ExprType_Assign: return visitAssign((Assign *)expr);
                 case ExprType_Ternary: return visitTernary((Ternary *)expr);
                 case ExprType_Binary: return visitBinary((Binary *)expr);
                 case ExprType_Grouping: return visitGrouping((Grouping *)expr);
@@ -317,7 +328,7 @@ namespace Interpreter
         {
             value = evaluate(stmt->initializer);
         }
-        environment.define(stmt->name->lexeme, value);
+        environment.define(stmt->name, value);
     }
 
     void execute(Stmt *stmt)

@@ -98,13 +98,38 @@ Expression * Parser::expressionStatement()
 
 Expr * Parser::expression()
 {
-    Expr *expr = conditional();
+    Expr *expr = assignment();
 
     while (match(COMMA))
     {
         Token *oper = new Token(previous());
-        Expr *right = conditional();
+        Expr *right = assignment();
         expr = new Binary(expr, oper, right);
+    }
+
+    return expr;
+}
+
+Expr * Parser::assignment()
+{
+    Expr *expr = equality();
+
+    if (match(EQUAL))
+    {
+        Token equals = previous();
+
+        if (expr->type == ExprType_Variable)
+        {
+            Expr *value = assignment();
+            Variable *variable = (Variable *)expr;
+            Token *name = new Token(*variable->name);
+            delete expr;
+            return new Assign(name, value);
+        }
+        else
+        {
+            error(equals, "Invalid assign target.");
+        }
     }
 
     return expr;

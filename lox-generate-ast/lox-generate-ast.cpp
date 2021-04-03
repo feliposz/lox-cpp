@@ -153,6 +153,7 @@ int main(int argc, char *argv[])
     const char *outputDir = argv[1];
 
     std::vector<std::string> exprTypes = {
+        "Assign   : Token name, Expr value",
         "Ternary  : Expr first, Token oper1, Expr second, Token oper2, Expr third",
         "Binary   : Expr left, Token oper, Expr right",
         "Grouping : Expr expression",
