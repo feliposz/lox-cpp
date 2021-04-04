@@ -19,7 +19,7 @@ void Lox::runFile(char *filename)
         std::ostringstream content;
         content << infile.rdbuf();
         infile.close();
-        run(content.str());
+        run(content.str(), false);
         if (hadError)
         {
             exit(65);
@@ -43,7 +43,7 @@ void Lox::runPrompt()
         std::cout << "> ";
         if (std::getline(std::cin, line))
         {
-            run(line);
+            run(line, true);
             hadError = false;
         }
         else
@@ -53,13 +53,13 @@ void Lox::runPrompt()
     }
 }
 
-void Lox::run(std::string source)
+void Lox::run(std::string source, bool repl)
 {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scanTokens();
     Parser parser(tokens);
     std::vector<Stmt *> statements = parser.parse();
-    Interpreter::interpret(statements);
+    Interpreter::interpret(statements, repl);
     for (auto &statement : statements)
     {
         delete statement;

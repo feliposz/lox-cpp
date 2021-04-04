@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 struct Stmt;
 
 class ListStmt

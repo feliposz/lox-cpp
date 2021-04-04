@@ -316,9 +316,13 @@ namespace Interpreter
         }
     }
 
-    void visitExpression(Expression *stmt)
+    void visitExpression(Expression *stmt, bool repl)
     {
-        evaluate(stmt->expression);
+        Object value = evaluate(stmt->expression);
+        if (repl && !Lox::hadRuntimeError)
+        {
+            std::cout << value.str() << std::endl;
+        }
     }
 
     void visitVar(Var *stmt)
@@ -331,41 +335,41 @@ namespace Interpreter
         environment->define(stmt->name, value);
     }
 
-    void execute(Stmt *stmt);
-    void visitBlock(Block *stmt)
+    void execute(Stmt *stmt, bool repl);
+    void visitBlock(Block *stmt, bool repl)
     {
         Environment *savedEnvironment = environment;
         environment = new Environment(environment);
         for (auto &s : stmt->statements->list)
         {
-            execute(s);
+            execute(s, repl);
         }
         environment = savedEnvironment;
     }
 
-    void execute(Stmt *stmt)
+    void execute(Stmt *stmt, bool repl)
     {
         if (stmt)
         {
             switch (stmt->type)
             {
                 case StmtType_Print: visitPrint((Print *)stmt); break;
-                case StmtType_Expression: visitExpression((Expression *)stmt); break;
+                case StmtType_Expression: visitExpression((Expression *)stmt, repl); break;
                 case StmtType_Var: visitVar((Var *)stmt); break;
-                case StmtType_Block: visitBlock((Block *)stmt); break;
+                case StmtType_Block: visitBlock((Block *)stmt, repl); break;
                 default:
                     Lox::error(EOF_TOKEN, "Invalid statement type.");
             }
-        }        
+        }
     }
 
-    void interpret(std::vector<Stmt *> statements)
+    void interpret(std::vector<Stmt *> statements, bool repl)
     {
         for (auto &statement : statements)
         {
             if (statement)
             {
-                execute(statement);
+                execute(statement, repl);
             }
             if (Lox::hadRuntimeError)
             {
