@@ -5,6 +5,7 @@
 
 enum ObjectType
 {
+    TYPE_UNINITIALIZED,
     TYPE_NIL,
     TYPE_NUMBER,
     TYPE_STRING,

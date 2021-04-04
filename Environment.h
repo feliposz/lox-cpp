@@ -51,6 +51,10 @@ public:
 
         if (it != values.end())
         {
+            if (it->second.type == TYPE_UNINITIALIZED)
+            {
+                Lox::runtimeError(*name, "Uninitialized variable '" + name->lexeme + "'");
+            }
             return it->second;
         }
         else if (enclosing)

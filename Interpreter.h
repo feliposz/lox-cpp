@@ -332,6 +332,10 @@ namespace Interpreter
         {
             value = evaluate(stmt->initializer);
         }
+        else
+        {
+            value.type = TYPE_UNINITIALIZED;
+        }
         environment->define(stmt->name, value);
     }
 
