@@ -65,6 +65,10 @@ Stmt * Parser::statement()
     {
         return printStatement();
     }
+    else if (match(LEFT_BRACE))
+    {
+        return blockStatement();
+    }
     return expressionStatement();
 }
 
@@ -94,6 +98,19 @@ Expression * Parser::expressionStatement()
         delete expr;
         return nullptr;
     }
+}
+
+Block * Parser::blockStatement()
+{
+    ListStmt *stmts = new ListStmt();
+
+    while (!check(RIGHT_BRACE) && !isAtEnd())
+    {
+        stmts->list.emplace_back(declaration());
+    }
+
+    consume(RIGHT_BRACE, "Expect '}' after block.");
+    return new Block(stmts);
 }
 
 Expr * Parser::expression()

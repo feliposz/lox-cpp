@@ -14,6 +14,7 @@ private:
     Stmt *statement();
     Print *printStatement();
     Expression *expressionStatement();
+    Block *blockStatement();
     Expr *expression();
     Expr *assignment();
     Expr *conditional();

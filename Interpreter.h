@@ -7,7 +7,7 @@
 
 namespace Interpreter
 {
-    Environment environment;
+    Environment *environment = new Environment();
 
     Object evaluate(Expr *expr);
 
@@ -76,7 +76,7 @@ namespace Interpreter
     Object visitAssign(Assign *expr)
     {
         Object value = evaluate(expr->value);
-        environment.assign(expr->name, value);
+        environment->assign(expr->name, value);
         return value;
     }
 
@@ -284,7 +284,7 @@ namespace Interpreter
 
     Object visitVariable(Variable *expr)
     {
-        return environment.get(expr->name);
+        return environment->get(expr->name);
     }
 
     Object evaluate(Expr *expr)
@@ -328,7 +328,19 @@ namespace Interpreter
         {
             value = evaluate(stmt->initializer);
         }
-        environment.define(stmt->name, value);
+        environment->define(stmt->name, value);
+    }
+
+    void execute(Stmt *stmt);
+    void visitBlock(Block *stmt)
+    {
+        Environment *savedEnvironment = environment;
+        environment = new Environment(environment);
+        for (auto &s : stmt->statements->list)
+        {
+            execute(s);
+        }
+        environment = savedEnvironment;
     }
 
     void execute(Stmt *stmt)
@@ -340,6 +352,7 @@ namespace Interpreter
                 case StmtType_Print: visitPrint((Print *)stmt); break;
                 case StmtType_Expression: visitExpression((Expression *)stmt); break;
                 case StmtType_Var: visitVar((Var *)stmt); break;
+                case StmtType_Block: visitBlock((Block *)stmt); break;
                 default:
                     Lox::error(EOF_TOKEN, "Invalid statement type.");
             }

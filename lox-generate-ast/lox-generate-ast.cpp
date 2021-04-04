@@ -112,7 +112,7 @@ void defineAst(const char *outputDir, const char *basename, std::vector<std::str
         {
             writer << "#include \"" << include << ".h\"" << std::endl;
         }
-        
+
         writer << std::endl;
         writer << "enum " << basename << "Type" << std::endl;
         writer << "{" << std::endl;
@@ -168,8 +168,9 @@ int main(int argc, char *argv[])
         "Expression : Expr expression",
         "Print : Expr expression",
         "Var : Token name, Expr initializer",
+        "Block : ListStmt statements",
     };
-    std::vector<std::string> stmtIncludes = { "Expr" };
+    std::vector<std::string> stmtIncludes = { "Expr", "ListStmt" };
     defineAst(outputDir, "Stmt", stmtTypes, stmtIncludes);
 
     return EXIT_SUCCESS;

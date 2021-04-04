@@ -7,8 +7,19 @@ class Environment
 {
 private:
     std::unordered_map<std::string, Object> values;
+    Environment *enclosing;
 
 public:
+
+    Environment()
+    {
+        enclosing = nullptr;
+    }
+
+    Environment(Environment *enclosing)
+    {
+        this->enclosing = enclosing;
+    }
 
     void define(Token *name, Object value)
     {
@@ -24,6 +35,10 @@ public:
         {
             it->second = value;
         }
+        else if (enclosing)
+        {
+            enclosing->assign(name, value);
+        }
         else
         {
             Lox::runtimeError(*name, "Undefined variable '" + name->lexeme + "'");
@@ -37,6 +52,10 @@ public:
         if (it != values.end())
         {
             return it->second;
+        }
+        else if (enclosing)
+        {
+            return enclosing->get(name);
         }
 
         Lox::runtimeError(*name, "Undefined variable '" + name->lexeme + "'");

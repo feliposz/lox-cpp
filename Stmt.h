@@ -1,12 +1,14 @@
 #pragma once
 
 #include "Expr.h"
+#include "ListStmt.h"
 
 enum StmtType
 {
     StmtType_Expression,
     StmtType_Print,
     StmtType_Var,
+    StmtType_Block,
 };
 
 struct Stmt
@@ -68,6 +70,21 @@ struct Var : public Stmt
     {
         delete name;
         delete initializer;
+    }
+};
+
+struct Block : public Stmt
+{
+    ListStmt *statements;
+
+    Block(ListStmt *statements) : Stmt(StmtType_Block)
+    {
+        this->statements = statements;
+    }
+
+    ~Block()
+    {
+        delete statements;
     }
 };
 

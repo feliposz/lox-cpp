@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ListStmt.cpp" />
     <ClCompile Include="lox-cpp.cpp" />
     <ClCompile Include="Lox.cpp" />
     <ClCompile Include="Parser.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="AstPrinter.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="Expr.h" />
+    <ClInclude Include="ListStmt.h" />
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="Lox.h" />
     <ClInclude Include="Parser.h" />
