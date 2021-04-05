@@ -17,6 +17,7 @@ private:
     Stmt *blockStatement();
     Stmt *ifStatement();
     Stmt *whileStatement();
+    Stmt *forStatement();
     Expr *expression();
     Expr *assignment();
     Expr *conditional();

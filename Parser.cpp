@@ -77,6 +77,10 @@ Stmt * Parser::statement()
     {
         return whileStatement();
     }
+    else if (match(FOR))
+    {
+        return forStatement();
+    }
     return expressionStatement();
 }
 
@@ -145,6 +149,74 @@ Stmt * Parser::whileStatement()
     Stmt *body = statement();
     return new While(expr, body);
 }
+
+Stmt * Parser::forStatement()
+{
+    consume(LEFT_PAREN, "Expected '(' after 'for'.");
+
+    Stmt *initializer;
+    if (match(SEMICOLON))
+    {
+        initializer = nullptr;
+    }
+    else if (match(VAR))
+    {
+        initializer = varDeclaration();
+    }
+    else
+    {
+        initializer = expressionStatement();
+    }
+
+    Expr *condition;
+    if (check(SEMICOLON))
+    {
+        condition = nullptr;
+    }
+    else 
+    {
+        condition = expression();
+    }
+    consume(SEMICOLON, "Expected ';' after for condition.");
+
+    Expr *increment;
+    if (check(RIGHT_PAREN))
+    {
+        increment = nullptr;
+    }
+    else
+    {
+        increment = expression();
+    }
+    consume(RIGHT_PAREN, "Expected ')' after for increment.");
+
+    Stmt *body = statement();
+
+    if (increment)
+    {
+        ListStmt *stmts = new ListStmt();
+        stmts->list.push_back(body);
+        stmts->list.push_back(new Expression(increment));
+        body = new Block(stmts);
+    }
+
+    if (!condition)
+    {
+        condition = new Literal(new Object(true));
+    }
+    body = new While(condition, body);
+
+    if (initializer)
+    {
+        ListStmt *stmts = new ListStmt();
+        stmts->list.push_back(initializer);
+        stmts->list.push_back(body);
+        body = new Block(stmts);
+    }
+
+    return body;
+}
+
 Expr * Parser::expression()
 {
     Expr *expr = assignment();
