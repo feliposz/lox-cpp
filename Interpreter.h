@@ -386,6 +386,14 @@ namespace Interpreter
         }
     }
 
+    void visitWhile(While *stmt)
+    {
+        while (isTruthy(evaluate(stmt->condition)))
+        {
+            execute(stmt->body, false);
+        }
+    }
+
     void execute(Stmt *stmt, bool repl)
     {
         if (stmt)
@@ -397,6 +405,7 @@ namespace Interpreter
                 case StmtType_Var: visitVar((Var *)stmt); break;
                 case StmtType_Block: visitBlock((Block *)stmt, repl); break;
                 case StmtType_If: visitIf((If *)stmt); break;
+                case StmtType_While: visitWhile((While *)stmt); break;
                 default:
                     Lox::error(EOF_TOKEN, "Invalid statement type.");
             }

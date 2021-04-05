@@ -10,6 +10,7 @@ enum StmtType
     StmtType_Var,
     StmtType_Block,
     StmtType_If,
+    StmtType_While,
 };
 
 struct Stmt
@@ -107,6 +108,24 @@ struct If : public Stmt
         delete condition;
         delete thenBranch;
         delete elseBranch;
+    }
+};
+
+struct While : public Stmt
+{
+    Expr *condition;
+    Stmt *body;
+
+    While(Expr *condition, Stmt *body) : Stmt(StmtType_While)
+    {
+        this->condition = condition;
+        this->body = body;
+    }
+
+    ~While()
+    {
+        delete condition;
+        delete body;
     }
 };
 

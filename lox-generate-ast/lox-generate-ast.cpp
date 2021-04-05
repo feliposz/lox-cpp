@@ -171,6 +171,7 @@ int main(int argc, char *argv[])
         "Var : Token name, Expr initializer",
         "Block : ListStmt statements",
         "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
+        "While : Expr condition, Stmt body",
     };
     std::vector<std::string> stmtIncludes = { "Expr", "ListStmt" };
     defineAst(outputDir, "Stmt", stmtTypes, stmtIncludes);

@@ -73,10 +73,14 @@ Stmt * Parser::statement()
     {
         return ifStatement();
     }
+    else if (match(WHILE))
+    {
+        return whileStatement();
+    }
     return expressionStatement();
 }
 
-Print * Parser::printStatement()
+Stmt * Parser::printStatement()
 {
     Expr *expr = expression();
     if (consume(SEMICOLON, "Expected ';' after value."))
@@ -90,7 +94,7 @@ Print * Parser::printStatement()
     }
 }
 
-Expression * Parser::expressionStatement()
+Stmt * Parser::expressionStatement()
 {
     Expr *expr = expression();
     if (consume(SEMICOLON, "Expected ';' after value."))
@@ -104,7 +108,7 @@ Expression * Parser::expressionStatement()
     }
 }
 
-Block * Parser::blockStatement()
+Stmt * Parser::blockStatement()
 {
     ListStmt *stmts = new ListStmt();
 
@@ -117,7 +121,7 @@ Block * Parser::blockStatement()
     return new Block(stmts);
 }
 
-If * Parser::ifStatement()
+Stmt * Parser::ifStatement()
 {
     consume(LEFT_PAREN, "Expected '(' after 'if'.");
     Expr *expr = expression();
@@ -133,6 +137,14 @@ If * Parser::ifStatement()
     return new If(expr, thenStmt, elseStmt);
 }
 
+Stmt * Parser::whileStatement()
+{
+    consume(LEFT_PAREN, "Expected '(' after 'while'.");
+    Expr *expr = expression();
+    consume(RIGHT_PAREN, "Expected ')' after expression.");
+    Stmt *body = statement();
+    return new While(expr, body);
+}
 Expr * Parser::expression()
 {
     Expr *expr = assignment();

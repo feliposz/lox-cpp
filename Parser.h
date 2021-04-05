@@ -12,10 +12,11 @@ private:
     Stmt *declaration();
     Stmt *varDeclaration();
     Stmt *statement();
-    Print *printStatement();
-    Expression *expressionStatement();
-    Block *blockStatement();
-    If *ifStatement();
+    Stmt *printStatement();
+    Stmt *expressionStatement();
+    Stmt *blockStatement();
+    Stmt *ifStatement();
+    Stmt *whileStatement();
     Expr *expression();
     Expr *assignment();
     Expr *conditional();
