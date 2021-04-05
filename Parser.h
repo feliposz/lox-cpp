@@ -15,9 +15,12 @@ private:
     Print *printStatement();
     Expression *expressionStatement();
     Block *blockStatement();
+    If *ifStatement();
     Expr *expression();
     Expr *assignment();
     Expr *conditional();
+    Expr *logic_or();
+    Expr *logic_and();
     Expr *equality();
     Expr *comparison();
     Expr *term();

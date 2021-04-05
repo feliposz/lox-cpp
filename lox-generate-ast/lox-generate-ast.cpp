@@ -156,6 +156,7 @@ int main(int argc, char *argv[])
         "Assign   : Token name, Expr value",
         "Ternary  : Expr first, Token oper1, Expr second, Token oper2, Expr third",
         "Binary   : Expr left, Token oper, Expr right",
+        "Logical  : Expr left, Token oper, Expr right",
         "Grouping : Expr expression",
         "Literal  : Object value",
         "Unary    : Token oper, Expr right",
@@ -169,6 +170,7 @@ int main(int argc, char *argv[])
         "Print : Expr expression",
         "Var : Token name, Expr initializer",
         "Block : ListStmt statements",
+        "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
     };
     std::vector<std::string> stmtIncludes = { "Expr", "ListStmt" };
     defineAst(outputDir, "Stmt", stmtTypes, stmtIncludes);

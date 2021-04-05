@@ -69,6 +69,10 @@ Stmt * Parser::statement()
     {
         return blockStatement();
     }
+    else if (match(IF))
+    {
+        return ifStatement();
+    }
     return expressionStatement();
 }
 
@@ -113,6 +117,22 @@ Block * Parser::blockStatement()
     return new Block(stmts);
 }
 
+If * Parser::ifStatement()
+{
+    consume(LEFT_PAREN, "Expected '(' after 'if'.");
+    Expr *expr = expression();
+    consume(RIGHT_PAREN, "Expected ')' after expression.");
+    
+    Stmt *thenStmt = statement();
+    Stmt *elseStmt = nullptr;
+    if (match(ELSE))
+    {
+        elseStmt = statement();
+    }
+
+    return new If(expr, thenStmt, elseStmt);
+}
+
 Expr * Parser::expression()
 {
     Expr *expr = assignment();
@@ -129,7 +149,7 @@ Expr * Parser::expression()
 
 Expr * Parser::assignment()
 {
-    Expr *expr = equality();
+    Expr *expr = conditional();
 
     if (match(EQUAL))
     {
@@ -154,7 +174,7 @@ Expr * Parser::assignment()
 
 Expr * Parser::conditional()
 {
-    Expr *expr = equality();
+    Expr *expr = logic_or();
 
     if (match(QUESTION))
     {
@@ -172,6 +192,34 @@ Expr * Parser::conditional()
             delete question;
             delete second;
         }
+    }
+
+    return expr;
+}
+
+Expr * Parser::logic_or()
+{
+    Expr *expr = logic_and();
+
+    while (match(OR))
+    {
+        Token *oper = new Token(previous());
+        Expr *right = logic_and();
+        expr = new Logical(expr, oper, right);
+    }
+
+    return expr;
+}
+
+Expr * Parser::logic_and()
+{
+    Expr *expr = equality();
+
+    while (match(AND))
+    {
+        Token *oper = new Token(previous());
+        Expr *right = equality();
+        expr = new Logical(expr, oper, right);
     }
 
     return expr;

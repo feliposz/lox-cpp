@@ -7,6 +7,7 @@ enum ExprType
     ExprType_Assign,
     ExprType_Ternary,
     ExprType_Binary,
+    ExprType_Logical,
     ExprType_Grouping,
     ExprType_Literal,
     ExprType_Unary,
@@ -86,6 +87,27 @@ struct Binary : public Expr
     }
 
     ~Binary()
+    {
+        delete left;
+        delete oper;
+        delete right;
+    }
+};
+
+struct Logical : public Expr
+{
+    Expr *left;
+    Token *oper;
+    Expr *right;
+
+    Logical(Expr *left, Token *oper, Expr *right) : Expr(ExprType_Logical)
+    {
+        this->left = left;
+        this->oper = oper;
+        this->right = right;
+    }
+
+    ~Logical()
     {
         delete left;
         delete oper;

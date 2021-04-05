@@ -245,6 +245,28 @@ namespace Interpreter
         return nullptr;
     }
 
+    Object visitLogical(Logical *expr)
+    {
+        Object left = evaluate(expr->left);
+
+        if (expr->oper->type == AND)
+        {
+            if (isTruthy(left))
+            {
+                return evaluate(expr->right);
+            }
+        }
+        else
+        {
+            if (!isTruthy(left))
+            {
+                return evaluate(expr->right);
+            }
+        }
+
+        return left;
+    }
+
     Object visitGrouping(Grouping *expr)
     {
         Object value = evaluate(expr->expression);
@@ -296,6 +318,7 @@ namespace Interpreter
                 case ExprType_Assign: return visitAssign((Assign *)expr);
                 case ExprType_Ternary: return visitTernary((Ternary *)expr);
                 case ExprType_Binary: return visitBinary((Binary *)expr);
+                case ExprType_Logical: return visitLogical((Logical *)expr);
                 case ExprType_Grouping: return visitGrouping((Grouping *)expr);
                 case ExprType_Literal: return visitLiteral((Literal *)expr);
                 case ExprType_Unary: return visitUnary((Unary *)expr);
@@ -351,6 +374,18 @@ namespace Interpreter
         environment = savedEnvironment;
     }
 
+    void visitIf(If *stmt)
+    {
+        if (isTruthy(evaluate(stmt->condition)))
+        {
+            execute(stmt->thenBranch, false);
+        }
+        else
+        {
+            execute(stmt->elseBranch, false);
+        }
+    }
+
     void execute(Stmt *stmt, bool repl)
     {
         if (stmt)
@@ -361,6 +396,7 @@ namespace Interpreter
                 case StmtType_Expression: visitExpression((Expression *)stmt, repl); break;
                 case StmtType_Var: visitVar((Var *)stmt); break;
                 case StmtType_Block: visitBlock((Block *)stmt, repl); break;
+                case StmtType_If: visitIf((If *)stmt); break;
                 default:
                     Lox::error(EOF_TOKEN, "Invalid statement type.");
             }

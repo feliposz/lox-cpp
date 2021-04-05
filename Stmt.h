@@ -9,6 +9,7 @@ enum StmtType
     StmtType_Print,
     StmtType_Var,
     StmtType_Block,
+    StmtType_If,
 };
 
 struct Stmt
@@ -85,6 +86,27 @@ struct Block : public Stmt
     ~Block()
     {
         delete statements;
+    }
+};
+
+struct If : public Stmt
+{
+    Expr *condition;
+    Stmt *thenBranch;
+    Stmt *elseBranch;
+
+    If(Expr *condition, Stmt *thenBranch, Stmt *elseBranch) : Stmt(StmtType_If)
+    {
+        this->condition = condition;
+        this->thenBranch = thenBranch;
+        this->elseBranch = elseBranch;
+    }
+
+    ~If()
+    {
+        delete condition;
+        delete thenBranch;
+        delete elseBranch;
     }
 };
 
