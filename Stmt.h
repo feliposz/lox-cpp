@@ -11,6 +11,7 @@ enum StmtType
     StmtType_Block,
     StmtType_If,
     StmtType_While,
+    StmtType_Break,
 };
 
 struct Stmt
@@ -126,6 +127,18 @@ struct While : public Stmt
     {
         delete condition;
         delete body;
+    }
+};
+
+struct Break : public Stmt
+{
+
+    Break() : Stmt(StmtType_Break)
+    {
+    }
+
+    ~Break()
+    {
     }
 };
 

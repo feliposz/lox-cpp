@@ -8,6 +8,7 @@ class Parser
 {
 private:
     unsigned int current = 0;
+    unsigned int loopDepth = 0;
     std::vector<Token> tokens;
     Stmt *declaration();
     Stmt *varDeclaration();
@@ -18,6 +19,7 @@ private:
     Stmt *ifStatement();
     Stmt *whileStatement();
     Stmt *forStatement();
+    Stmt *breakStatement();
     Expr *expression();
     Expr *assignment();
     Expr *conditional();

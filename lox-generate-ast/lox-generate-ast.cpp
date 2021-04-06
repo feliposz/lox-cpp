@@ -172,6 +172,7 @@ int main(int argc, char *argv[])
         "Block : ListStmt statements",
         "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
         "While : Expr condition, Stmt body",
+        "Break : ",
     };
     std::vector<std::string> stmtIncludes = { "Expr", "ListStmt" };
     defineAst(outputDir, "Stmt", stmtTypes, stmtIncludes);

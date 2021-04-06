@@ -8,6 +8,7 @@
 namespace Interpreter
 {
     Environment *environment = new Environment();
+    bool breakSet = false;
 
     Object evaluate(Expr *expr);
 
@@ -370,6 +371,10 @@ namespace Interpreter
         for (auto &s : stmt->statements->list)
         {
             execute(s, repl);
+            if (breakSet || Lox::hadRuntimeError)
+            {
+                break;
+            }
         }
         environment = savedEnvironment;
     }
@@ -391,7 +396,17 @@ namespace Interpreter
         while (isTruthy(evaluate(stmt->condition)))
         {
             execute(stmt->body, false);
+            if (breakSet || Lox::hadRuntimeError)
+            {
+                breakSet = false;
+                break;
+            }
         }
+    }
+
+    void visitBreak(Break *stmt)
+    {
+        breakSet = true;
     }
 
     void execute(Stmt *stmt, bool repl)
@@ -406,6 +421,7 @@ namespace Interpreter
                 case StmtType_Block: visitBlock((Block *)stmt, repl); break;
                 case StmtType_If: visitIf((If *)stmt); break;
                 case StmtType_While: visitWhile((While *)stmt); break;
+                case StmtType_Break: visitBreak((Break *)stmt); break;
                 default:
                     Lox::error(EOF_TOKEN, "Invalid statement type.");
             }

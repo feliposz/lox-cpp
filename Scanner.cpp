@@ -228,7 +228,8 @@ static std::unordered_map<std::string, TokenType> keywords({
     { "this", THIS },
     { "true", TRUE_TOKEN },
     { "var", VAR },
-    { "while", WHILE }
+    { "while", WHILE },
+    { "break", BREAK},
 });
 
 void Scanner::identifier()

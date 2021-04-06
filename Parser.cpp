@@ -81,6 +81,10 @@ Stmt * Parser::statement()
     {
         return forStatement();
     }
+    else if (match(BREAK))
+    {
+        return breakStatement();
+    }
     return expressionStatement();
 }
 
@@ -146,7 +150,9 @@ Stmt * Parser::whileStatement()
     consume(LEFT_PAREN, "Expected '(' after 'while'.");
     Expr *expr = expression();
     consume(RIGHT_PAREN, "Expected ')' after expression.");
+    loopDepth++;
     Stmt *body = statement();
+    loopDepth--;
     return new While(expr, body);
 }
 
@@ -190,7 +196,9 @@ Stmt * Parser::forStatement()
     }
     consume(RIGHT_PAREN, "Expected ')' after for increment.");
 
+    loopDepth++;
     Stmt *body = statement();
+    loopDepth--;
 
     if (increment)
     {
@@ -215,6 +223,16 @@ Stmt * Parser::forStatement()
     }
 
     return body;
+}
+
+Stmt * Parser::breakStatement()
+{
+    consume(SEMICOLON, "Expected ';' after 'break'.");
+    if (loopDepth == 0)
+    {
+        Lox::runtimeError(previous(), "'break' statement not enclosed by while/for loop.");
+    }
+    return new Break();
 }
 
 Expr * Parser::expression()
