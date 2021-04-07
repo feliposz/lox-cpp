@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Token.h"
+#include "ListExpr.h"
 
 enum ExprType
 {
@@ -12,6 +13,7 @@ enum ExprType
     ExprType_Literal,
     ExprType_Unary,
     ExprType_Variable,
+    ExprType_Call,
 };
 
 struct Expr
@@ -175,6 +177,27 @@ struct Variable : public Expr
     ~Variable()
     {
         delete name;
+    }
+};
+
+struct Call : public Expr
+{
+    Expr *callee;
+    Token *paren;
+    ListExpr *arguments;
+
+    Call(Expr *callee, Token *paren, ListExpr *arguments) : Expr(ExprType_Call)
+    {
+        this->callee = callee;
+        this->paren = paren;
+        this->arguments = arguments;
+    }
+
+    ~Call()
+    {
+        delete callee;
+        delete paren;
+        delete arguments;
     }
 };
 

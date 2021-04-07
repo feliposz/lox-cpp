@@ -30,6 +30,8 @@ private:
     Expr *term();
     Expr *factor();
     Expr *unary();
+    Expr *call();
+    Expr *finishCall(Expr *callee);
     Expr *primary();
     bool match(TokenType type);
     bool check(TokenType type);

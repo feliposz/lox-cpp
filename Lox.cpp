@@ -59,7 +59,8 @@ void Lox::run(std::string source, bool repl)
     std::vector<Token> tokens = scanner.scanTokens();
     Parser parser(tokens);
     std::vector<Stmt *> statements = parser.parse();
-    Interpreter::interpret(statements, repl);
+    Interpreter interpreter;
+    interpreter.interpret(statements, repl);
     for (auto &statement : statements)
     {
         delete statement;

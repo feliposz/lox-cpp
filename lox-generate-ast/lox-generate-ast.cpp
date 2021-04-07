@@ -161,18 +161,19 @@ int main(int argc, char *argv[])
         "Literal  : Object value",
         "Unary    : Token oper, Expr right",
         "Variable : Token name",
+        "Call     : Expr callee, Token paren, ListExpr arguments",
     };
-    std::vector<std::string> exprIncludes = { "Token" };
+    std::vector<std::string> exprIncludes = { "Token", "ListExpr" };
     defineAst(outputDir, "Expr", exprTypes, exprIncludes);
 
     std::vector<std::string> stmtTypes = {
         "Expression : Expr expression",
-        "Print : Expr expression",
-        "Var : Token name, Expr initializer",
-        "Block : ListStmt statements",
-        "If : Expr condition, Stmt thenBranch, Stmt elseBranch",
-        "While : Expr condition, Stmt body",
-        "Break : ",
+        "Print      : Expr expression",
+        "Var        : Token name, Expr initializer",
+        "Block      : ListStmt statements",
+        "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
+        "While      : Expr condition, Stmt body",
+        "Break      : ",
     };
     std::vector<std::string> stmtIncludes = { "Expr", "ListStmt" };
     defineAst(outputDir, "Stmt", stmtTypes, stmtIncludes);

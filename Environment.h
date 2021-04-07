@@ -23,8 +23,13 @@ public:
 
     void define(Token *name, Object value)
     {
+        define(name->lexeme, value);
+    }
+
+    void define(std::string name, Object value)
+    {
         // TODO: check redefinition?
-        values.emplace(name->lexeme, value);
+        values.emplace(name, value);
     }
 
     void assign(Token *name, Object value)

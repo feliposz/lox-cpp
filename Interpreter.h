@@ -1,16 +1,51 @@
 #pragma once
 
+#include <iostream>
+#include <chrono>
 #include <string>
 #include "Lox.h"
 #include "Expr.h"
+#include "Stmt.h"
 #include "Environment.h"
+#include "Callable.h"
 
-namespace Interpreter
+class ClockFunction : public Callable
 {
-    Environment *environment = new Environment();
+    virtual int arity() override
+    {
+        return 0;
+    }
+
+    virtual Object call(std::list<Object>) override
+    {
+        auto millisec_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+        Object value((double)millisec_since_epoch / 1000.0);
+        return value;
+    }
+
+    virtual std::string str() override
+    {
+        return "<native fn>";
+    }
+};
+
+class Interpreter
+{
+    static Environment *environment;
     bool breakSet = false;
 
-    Object evaluate(Expr *expr);
+public:
+
+    Interpreter()
+    {
+        if (!environment)
+        {
+            environment = new Environment();
+            Object clock(new ClockFunction());
+            environment->define("clock", clock);
+        }
+    }
 
     void runtimeError(Token oper, std::string message)
     {
@@ -310,6 +345,34 @@ namespace Interpreter
         return environment->get(expr->name);
     }
 
+    Object visitCall(Call *stmt)
+    {
+        Object callee = evaluate(stmt->callee);
+
+        std::list<Object> arguments;
+        for (auto &argument : stmt->arguments->list)
+        {
+            arguments.push_back(evaluate(argument));
+        }
+
+        if (callee.type != TYPE_FUNCTION)
+        {
+            runtimeError(*stmt->paren, "Can only call functions and methods.");
+        }
+
+        if (callee.function->arity() != arguments.size())
+        {
+            std::stringstream ss;
+            ss << "Expected " << callee.function->arity() << " arguments but got " << arguments.size() << ".";
+            runtimeError(*stmt->paren, ss.str());
+            return callee;
+        }
+        else
+        {
+            return callee.function->call(arguments);
+        }
+    }
+
     Object evaluate(Expr *expr)
     {
         if (expr)
@@ -324,6 +387,7 @@ namespace Interpreter
                 case ExprType_Literal: return visitLiteral((Literal *)expr);
                 case ExprType_Unary: return visitUnary((Unary *)expr);
                 case ExprType_Variable: return visitVariable((Variable *)expr);
+                case ExprType_Call: return visitCall((Call *)expr);
             }
         }
         Lox::error(EOF_TOKEN, "Invalid expression type.");
@@ -363,7 +427,6 @@ namespace Interpreter
         environment->define(stmt->name, value);
     }
 
-    void execute(Stmt *stmt, bool repl);
     void visitBlock(Block *stmt, bool repl)
     {
         Environment *savedEnvironment = environment;

@@ -238,14 +238,6 @@ Stmt * Parser::breakStatement()
 Expr * Parser::expression()
 {
     Expr *expr = assignment();
-
-    while (match(COMMA))
-    {
-        Token *oper = new Token(previous());
-        Expr *right = assignment();
-        expr = new Binary(expr, oper, right);
-    }
-
     return expr;
 }
 
@@ -399,7 +391,46 @@ Expr * Parser::unary()
             return nullptr;
         }
     }
-    return primary();
+    return call();
+}
+
+Expr * Parser::call()
+{
+    Expr *expr = primary();
+
+    while (true)
+    {
+        if (match(LEFT_PAREN))
+        {
+            expr = finishCall(expr);
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    return expr;
+}
+
+Expr * Parser::finishCall(Expr *callee)
+{
+    ListExpr *arguments = new ListExpr();
+
+    if (!check(RIGHT_PAREN))
+    {
+        do
+        {
+            if (arguments->list.size() >= 255)
+            {
+                error(peek(), "Can't have more than 255 arguments.");
+            }
+            arguments->list.push_back(expression());
+        } while (match(COMMA));
+    }
+    consume(RIGHT_PAREN, "Expected ')' after arguments.");
+
+    return new Call(callee, new Token(previous()), arguments);
 }
 
 Expr * Parser::primary()
