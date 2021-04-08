@@ -497,7 +497,7 @@ public:
 
     void visitFunction(Function *stmt)
     {
-        Object declaration(new LoxFunction(stmt));
+        Object declaration(new LoxFunction(stmt, environment));
         environment->define(stmt->name, declaration);
     }
 
