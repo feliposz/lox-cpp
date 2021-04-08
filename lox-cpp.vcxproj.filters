@@ -42,6 +42,12 @@
     <ClCompile Include="Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ListToken.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoxFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Token.h">
@@ -83,7 +89,13 @@
     <ClInclude Include="Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Callable.h">
+    <ClInclude Include="ListToken.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoxFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoxCallable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

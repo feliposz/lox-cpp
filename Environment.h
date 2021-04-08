@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <string>
+#include "Lox.h"
 
 class Environment
 {
@@ -47,7 +48,7 @@ public:
         else
         {
             Lox::runtimeError(*name, "Undefined variable '" + name->lexeme + "'");
-        }        
+        }
     }
 
     Object get(Token *name)

@@ -171,11 +171,13 @@ int main(int argc, char *argv[])
         "Print      : Expr expression",
         "Var        : Token name, Expr initializer",
         "Block      : ListStmt statements",
+        "Function   : Token name, ListToken params, Block body",
         "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
         "While      : Expr condition, Stmt body",
-        "Break      : ",
+        "Return     : Token keyword, Expr value",
+        "Break      : Token keyword",
     };
-    std::vector<std::string> stmtIncludes = { "Expr", "ListStmt" };
+    std::vector<std::string> stmtIncludes = { "Expr", "ListStmt", "ListToken" };
     defineAst(outputDir, "Stmt", stmtTypes, stmtIncludes);
 
     return EXIT_SUCCESS;

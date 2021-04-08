@@ -2,7 +2,7 @@
 
 #include <string>
 
-class Callable;
+class LoxCallable;
 
 enum ObjectType
 {
@@ -21,7 +21,7 @@ public:
     std::string strLiteral;
     double numLiteral;
     bool boolLiteral;
-    Callable *function;
+    LoxCallable *function;
 
     Object()
     {
@@ -46,7 +46,7 @@ public:
         boolLiteral = b;
     }
 
-    Object(Callable *function)
+    Object(LoxCallable *function)
     {
         type = TYPE_FUNCTION;
         this->function = function;

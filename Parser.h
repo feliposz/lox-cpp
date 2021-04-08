@@ -9,9 +9,11 @@ class Parser
 private:
     unsigned int current = 0;
     unsigned int loopDepth = 0;
+    unsigned int funDepth = 0;
     std::vector<Token> tokens;
     Stmt *declaration();
     Stmt *varDeclaration();
+    Stmt *function(std::string kind);
     Stmt *statement();
     Stmt *printStatement();
     Stmt *expressionStatement();
@@ -20,6 +22,7 @@ private:
     Stmt *whileStatement();
     Stmt *forStatement();
     Stmt *breakStatement();
+    Stmt *returnStatement();
     Expr *expression();
     Expr *assignment();
     Expr *conditional();

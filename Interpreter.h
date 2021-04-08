@@ -7,16 +7,19 @@
 #include "Expr.h"
 #include "Stmt.h"
 #include "Environment.h"
-#include "Callable.h"
+#include "LoxCallable.h"
+#include "LoxFunction.h"
 
-class ClockFunction : public Callable
+class Interpreter;
+
+class ClockFunction : public LoxCallable
 {
     virtual int arity() override
     {
         return 0;
     }
 
-    virtual Object call(std::list<Object>) override
+    virtual Object call(Interpreter *interpreter, std::vector<Object>) override
     {
         auto millisec_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -33,15 +36,21 @@ class ClockFunction : public Callable
 class Interpreter
 {
     static Environment *environment;
+    bool repl = false;
     bool breakSet = false;
+    bool returnSet = false;
+    Object returnValue;
 
 public:
+    static Environment *globals;
 
-    Interpreter()
+    Interpreter(bool repl)
     {
+        this->repl = repl;
         if (!environment)
         {
-            environment = new Environment();
+            globals = new Environment();
+            environment = globals;
             Object clock(new ClockFunction());
             environment->define("clock", clock);
         }
@@ -349,7 +358,7 @@ public:
     {
         Object callee = evaluate(stmt->callee);
 
-        std::list<Object> arguments;
+        std::vector<Object> arguments;
         for (auto &argument : stmt->arguments->list)
         {
             arguments.push_back(evaluate(argument));
@@ -369,7 +378,7 @@ public:
         }
         else
         {
-            return callee.function->call(arguments);
+            return callee.function->call(this, arguments);
         }
     }
 
@@ -404,7 +413,7 @@ public:
         }
     }
 
-    void visitExpression(Expression *stmt, bool repl)
+    void visitExpression(Expression *stmt)
     {
         Object value = evaluate(stmt->expression);
         if (repl && !Lox::hadRuntimeError)
@@ -427,30 +436,44 @@ public:
         environment->define(stmt->name, value);
     }
 
-    void visitBlock(Block *stmt, bool repl)
+    Object executeBlock(Block *stmt, Environment *execEnvironment)
     {
         Environment *savedEnvironment = environment;
-        environment = new Environment(environment);
+        environment = execEnvironment;
         for (auto &s : stmt->statements->list)
         {
-            execute(s, repl);
-            if (breakSet || Lox::hadRuntimeError)
+            execute(s);
+            if (breakSet || returnSet || Lox::hadRuntimeError)
             {
                 break;
             }
         }
         environment = savedEnvironment;
+        if (returnSet)
+        {
+            returnSet = false;
+            return returnValue;
+        }
+        Object nil; // TODO: return
+        return nil;
+    }
+
+    void visitBlock(Block *stmt)
+    {
+        Environment *locals = new Environment(environment);
+        executeBlock(stmt, locals);
+        delete locals;
     }
 
     void visitIf(If *stmt)
     {
         if (isTruthy(evaluate(stmt->condition)))
         {
-            execute(stmt->thenBranch, false);
+            execute(stmt->thenBranch);
         }
         else
         {
-            execute(stmt->elseBranch, false);
+            execute(stmt->elseBranch);
         }
     }
 
@@ -458,8 +481,8 @@ public:
     {
         while (isTruthy(evaluate(stmt->condition)))
         {
-            execute(stmt->body, false);
-            if (breakSet || Lox::hadRuntimeError)
+            execute(stmt->body);
+            if (breakSet || returnSet || Lox::hadRuntimeError)
             {
                 breakSet = false;
                 break;
@@ -472,32 +495,46 @@ public:
         breakSet = true;
     }
 
-    void execute(Stmt *stmt, bool repl)
+    void visitFunction(Function *stmt)
+    {
+        Object declaration(new LoxFunction(stmt));
+        environment->define(stmt->name, declaration);
+    }
+
+    void visitReturn(Return *stmt)
+    {
+        returnValue = evaluate(stmt->value);
+        returnSet = true;
+    }
+
+    void execute(Stmt *stmt)
     {
         if (stmt)
         {
             switch (stmt->type)
             {
                 case StmtType_Print: visitPrint((Print *)stmt); break;
-                case StmtType_Expression: visitExpression((Expression *)stmt, repl); break;
+                case StmtType_Expression: visitExpression((Expression *)stmt); break;
                 case StmtType_Var: visitVar((Var *)stmt); break;
-                case StmtType_Block: visitBlock((Block *)stmt, repl); break;
+                case StmtType_Block: visitBlock((Block *)stmt); break;
                 case StmtType_If: visitIf((If *)stmt); break;
                 case StmtType_While: visitWhile((While *)stmt); break;
                 case StmtType_Break: visitBreak((Break *)stmt); break;
+                case StmtType_Function: visitFunction((Function *)stmt); break;
+                case StmtType_Return: visitReturn((Return *)stmt); break;
                 default:
                     Lox::error(EOF_TOKEN, "Invalid statement type.");
             }
         }
     }
 
-    void interpret(std::vector<Stmt *> statements, bool repl)
+    void interpret(std::vector<Stmt *> statements)
     {
         for (auto &statement : statements)
         {
             if (statement)
             {
-                execute(statement, repl);
+                execute(statement);
             }
             if (Lox::hadRuntimeError)
             {

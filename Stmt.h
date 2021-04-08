@@ -2,6 +2,7 @@
 
 #include "Expr.h"
 #include "ListStmt.h"
+#include "ListToken.h"
 
 enum StmtType
 {
@@ -9,8 +10,10 @@ enum StmtType
     StmtType_Print,
     StmtType_Var,
     StmtType_Block,
+    StmtType_Function,
     StmtType_If,
     StmtType_While,
+    StmtType_Return,
     StmtType_Break,
 };
 
@@ -91,6 +94,27 @@ struct Block : public Stmt
     }
 };
 
+struct Function : public Stmt
+{
+    Token *name;
+    ListToken *params;
+    Block *body;
+
+    Function(Token *name, ListToken *params, Block *body) : Stmt(StmtType_Function)
+    {
+        this->name = name;
+        this->params = params;
+        this->body = body;
+    }
+
+    ~Function()
+    {
+        delete name;
+        delete params;
+        delete body;
+    }
+};
+
 struct If : public Stmt
 {
     Expr *condition;
@@ -130,15 +154,36 @@ struct While : public Stmt
     }
 };
 
+struct Return : public Stmt
+{
+    Token *keyword;
+    Expr *value;
+
+    Return(Token *keyword, Expr *value) : Stmt(StmtType_Return)
+    {
+        this->keyword = keyword;
+        this->value = value;
+    }
+
+    ~Return()
+    {
+        delete keyword;
+        delete value;
+    }
+};
+
 struct Break : public Stmt
 {
+    Token *keyword;
 
-    Break() : Stmt(StmtType_Break)
+    Break(Token *keyword) : Stmt(StmtType_Break)
     {
+        this->keyword = keyword;
     }
 
     ~Break()
     {
+        delete keyword;
     }
 };
 

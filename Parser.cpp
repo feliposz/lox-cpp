@@ -32,7 +32,11 @@ std::vector<Stmt *> Parser::parse()
 
 Stmt * Parser::declaration()
 {
-    if (match(VAR))
+    if (match(FUN))
+    {
+        return function("function");
+    }
+    else if (match(VAR))
     {
         return varDeclaration();
     }
@@ -55,6 +59,48 @@ Stmt * Parser::varDeclaration()
         {
             return new Var(name, initializer);
         }
+
+        delete initializer;
+        delete name;
+    }
+    return nullptr;
+}
+
+Stmt * Parser::function(std::string kind)
+{
+    if (consume(IDENTIFIER, "Expect " + kind + " name."))
+    {
+        Token *name = new Token(previous());
+        if (consume(LEFT_PAREN, "Expect '(' after " + kind + " name."))
+        {
+            ListToken *params = new ListToken();
+            if (!check(RIGHT_PAREN))
+            {
+                do
+                {
+                    if (consume(IDENTIFIER, "Expect parameter name."))
+                    {
+                        params->list.push_back(new Token(previous()));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                } while (match(COMMA));
+            }
+            if (consume(RIGHT_PAREN, "Expect ')' after parameters."))
+            {
+                if (consume(LEFT_BRACE, "Expect '{' before " + kind + " body."))
+                {
+                    funDepth++;
+                    Block *body = (Block *)blockStatement();
+                    funDepth--;
+                    return new Function(name, params, body);
+                }
+            }
+            delete params;
+        }
+        delete name;
     }
     return nullptr;
 }
@@ -84,6 +130,10 @@ Stmt * Parser::statement()
     else if (match(BREAK))
     {
         return breakStatement();
+    }
+    else if (match(RETURN))
+    {
+        return returnStatement();
     }
     return expressionStatement();
 }
@@ -120,7 +170,7 @@ Stmt * Parser::blockStatement()
 {
     ListStmt *stmts = new ListStmt();
 
-    while (!check(RIGHT_BRACE) && !isAtEnd())
+    while (!check(RIGHT_BRACE) && !isAtEnd() && !Lox::hadError)
     {
         stmts->list.emplace_back(declaration());
     }
@@ -227,12 +277,29 @@ Stmt * Parser::forStatement()
 
 Stmt * Parser::breakStatement()
 {
+    Token *keyword = new Token(previous());
     consume(SEMICOLON, "Expected ';' after 'break'.");
     if (loopDepth == 0)
     {
-        Lox::runtimeError(previous(), "'break' statement not enclosed by while/for loop.");
+        Lox::runtimeError(*keyword, "'break' statement not enclosed by while/for loop.");
     }
-    return new Break();
+    return new Break(keyword);
+}
+
+Stmt * Parser::returnStatement()
+{
+    Token *keyword = new Token(previous());
+    Expr *value = nullptr;
+    if (!check(SEMICOLON))
+    {
+        value = expression();
+    }
+    consume(SEMICOLON, "Expected ';' after 'return'.");
+    if (funDepth == 0)
+    {
+        Lox::runtimeError(*keyword, "'return' statement outside function body.");
+    }
+    return new Return(keyword, value);
 }
 
 Expr * Parser::expression()
@@ -257,10 +324,8 @@ Expr * Parser::assignment()
             delete expr;
             return new Assign(name, value);
         }
-        else
-        {
-            error(equals, "Invalid assign target.");
-        }
+
+        error(equals, "Invalid assign target.");
     }
 
     return expr;
