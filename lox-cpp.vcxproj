@@ -170,6 +170,7 @@
     <ClInclude Include="ListToken.h" />
     <ClInclude Include="Lox.h" />
     <ClInclude Include="LoxFunction.h" />
+    <ClInclude Include="NativeFunctions.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Scanner.h" />

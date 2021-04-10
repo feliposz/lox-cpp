@@ -34,7 +34,7 @@ Stmt * Parser::declaration()
 {
     if (match(FUN))
     {
-        return function("function");
+        return (Stmt *)function("function");
     }
     else if (match(VAR))
     {
@@ -66,41 +66,64 @@ Stmt * Parser::varDeclaration()
     return nullptr;
 }
 
-Stmt * Parser::function(std::string kind)
+void * Parser::function(std::string kind)
 {
-    if (consume(IDENTIFIER, "Expect " + kind + " name."))
+    Token *name = nullptr;
+    Token *keyword = nullptr;
+    if (kind == "lambda")
     {
-        Token *name = new Token(previous());
-        if (consume(LEFT_PAREN, "Expect '(' after " + kind + " name."))
+        keyword = new Token(previous());
+    }
+    else if (check(IDENTIFIER))
+    {
+        consume(IDENTIFIER, "Expect " + kind + " name.");
+        name = new Token(previous());
+    }
+    if (consume(LEFT_PAREN, "Expect '(' after " + kind + " name."))
+    {
+        ListToken *params = new ListToken();
+        if (!check(RIGHT_PAREN))
         {
-            ListToken *params = new ListToken();
-            if (!check(RIGHT_PAREN))
+            do
             {
-                do
+                if (consume(IDENTIFIER, "Expect parameter name."))
                 {
-                    if (consume(IDENTIFIER, "Expect parameter name."))
-                    {
-                        params->list.push_back(new Token(previous()));
-                    }
-                    else
-                    {
-                        break;
-                    }
-                } while (match(COMMA));
-            }
-            if (consume(RIGHT_PAREN, "Expect ')' after parameters."))
+                    params->list.push_back(new Token(previous()));
+                }
+                else
+                {
+                    break;
+                }
+            } while (match(COMMA));
+        }
+        if (consume(RIGHT_PAREN, "Expect ')' after parameters."))
+        {
+            if (consume(LEFT_BRACE, "Expect '{' before " + kind + " body."))
             {
-                if (consume(LEFT_BRACE, "Expect '{' before " + kind + " body."))
+                funDepth++;
+                Block *body = (Block *)blockStatement();
+                funDepth--;
+                if (kind == "lambda")
                 {
-                    funDepth++;
-                    Block *body = (Block *)blockStatement();
-                    funDepth--;
+                    //return new Lambda(keyword, params, body);
+                    Lox::error(*keyword, "Lambda not supported.");
+                }
+                else
+                {
+                    
                     return new Function(name, params, body);
                 }
             }
-            delete params;
         }
+        delete params;
+    }
+    if (name)
+    {
         delete name;
+    }
+    if (keyword)
+    {
+        delete keyword;
     }
     return nullptr;
 }
@@ -538,6 +561,10 @@ Expr * Parser::primary()
     else if (match(IDENTIFIER))
     {
         return new Variable(new Token(previous()));
+    }
+    else if (match(FUN))
+    {
+        return (Expr *)function("lambda");
     }
     else if (isAtEnd())
     {

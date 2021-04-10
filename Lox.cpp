@@ -59,8 +59,11 @@ void Lox::run(std::string source, bool repl)
     std::vector<Token> tokens = scanner.scanTokens();
     Parser parser(tokens);
     std::vector<Stmt *> statements = parser.parse();
-    Interpreter interpreter(repl);
-    interpreter.interpret(statements);
+    if (!hadError)
+    {
+        Interpreter interpreter(repl);
+        interpreter.interpret(statements);
+    }
     for (auto &statement : statements)
     {
         if (!repl || statement->type != StmtType_Function) // HACK: Must keep original function statement alive in REPL mode...

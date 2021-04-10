@@ -162,8 +162,9 @@ int main(int argc, char *argv[])
         "Unary    : Token oper, Expr right",
         "Variable : Token name",
         "Call     : Expr callee, Token paren, ListExpr arguments",
+        //"Lambda   : Token keyword, ListToken params, Block body",
     };
-    std::vector<std::string> exprIncludes = { "Token", "ListExpr" };
+    std::vector<std::string> exprIncludes = { "Token", "ListToken", "ListExpr" };
     defineAst(outputDir, "Expr", exprTypes, exprIncludes);
 
     std::vector<std::string> stmtTypes = {

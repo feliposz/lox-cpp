@@ -13,7 +13,7 @@ private:
     std::vector<Token> tokens;
     Stmt *declaration();
     Stmt *varDeclaration();
-    Stmt *function(std::string kind);
+    void *function(std::string kind);
     Stmt *statement();
     Stmt *printStatement();
     Stmt *expressionStatement();

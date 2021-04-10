@@ -98,5 +98,8 @@
     <ClInclude Include="LoxCallable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NativeFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
