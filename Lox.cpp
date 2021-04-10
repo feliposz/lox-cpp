@@ -7,6 +7,7 @@
 #include "AstPrinter.h"
 #include "Parser.h"
 #include "Interpreter.h"
+#include "Resolver.h"
 
 bool Lox::hadError = false;
 bool Lox::hadRuntimeError = false;
@@ -62,13 +63,21 @@ void Lox::run(std::string source, bool repl)
     if (!hadError)
     {
         Interpreter interpreter(repl);
-        interpreter.interpret(statements);
-    }
-    for (auto &statement : statements)
-    {
-        if (!repl || statement->type != StmtType_Function) // HACK: Must keep original function statement alive in REPL mode...
+        Resolver resolver(&interpreter);
+        resolver.resolve(statements);
+        if (!hadError)
         {
-            delete statement;
+            interpreter.interpret(statements);
+        }
+    }
+    if (!repl)
+    {
+        for (auto &statement : statements)
+        {
+            if (statement->type != StmtType_Function) // HACK: Must keep original function statement alive in REPL mode...
+            {
+                delete statement;
+            }
         }
     }
 }

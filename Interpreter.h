@@ -11,6 +11,7 @@
 class Interpreter
 {
     static Environment *environment;
+    static std::unordered_map<Expr *, int> *locals;
     bool repl = false;
     bool breakSet = false;
     bool returnSet = false;
@@ -45,4 +46,6 @@ public:
     void visitReturn(Return *stmt);
     void execute(Stmt *stmt);
     void interpret(std::vector<Stmt *> statements);
+    void resolve(Expr *expr, int depth);
+    Object lookUpVariable(Token *name, Variable *expr);
 };

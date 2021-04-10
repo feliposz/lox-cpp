@@ -100,9 +100,7 @@ void * Parser::function(std::string kind)
         {
             if (consume(LEFT_BRACE, "Expect '{' before " + kind + " body."))
             {
-                funDepth++;
                 Block *body = (Block *)blockStatement();
-                funDepth--;
                 if (kind == "lambda")
                 {
                     //return new Lambda(keyword, params, body);
@@ -318,10 +316,6 @@ Stmt * Parser::returnStatement()
         value = expression();
     }
     consume(SEMICOLON, "Expected ';' after 'return'.");
-    if (funDepth == 0)
-    {
-        Lox::runtimeError(*keyword, "'return' statement outside function body.");
-    }
     return new Return(keyword, value);
 }
 

@@ -3,6 +3,7 @@
 
 Environment *Interpreter::environment;
 Environment *Interpreter::globals;
+std::unordered_map<Expr *, int> *Interpreter::locals;
 
 Interpreter::Interpreter(bool repl)
 {
@@ -11,6 +12,7 @@ Interpreter::Interpreter(bool repl)
     {
         globals = new Environment();
         environment = globals;
+        locals = new std::unordered_map<Expr *, int>();
         Object clock(new ClockFunction());
         environment->define("clock", clock);
     }
@@ -81,7 +83,17 @@ bool Interpreter::checkNumberOperands(Token oper, Object a, Object b)
 Object Interpreter::visitAssign(Assign *expr)
 {
     Object value = evaluate(expr->value);
-    environment->assign(expr->name, value);
+
+    auto it = locals->find(expr);
+    if (it != locals->end())
+    {
+        int distance = it->second;
+        environment->defineAt(distance, expr->name, value);
+    }
+    else
+    {
+        globals->define(expr->name, value);
+    }
     return value;
 }
 
@@ -311,7 +323,7 @@ Object Interpreter::visitUnary(Unary *expr)
 
 Object Interpreter::visitVariable(Variable *expr)
 {
-    return environment->get(expr->name);
+    return lookUpVariable(expr->name, expr);
 }
 
 Object Interpreter::visitCall(Call *stmt)
@@ -328,18 +340,21 @@ Object Interpreter::visitCall(Call *stmt)
     {
         runtimeError(*stmt->paren, "Can only call functions and methods.");
     }
-
-    if (callee.function->arity() != arguments.size())
-    {
-        std::stringstream ss;
-        ss << "Expected " << callee.function->arity() << " arguments but got " << arguments.size() << ".";
-        runtimeError(*stmt->paren, ss.str());
-        return callee;
-    }
     else
     {
-        return callee.function->call(this, arguments);
+        if (callee.function->arity() != arguments.size())
+        {
+            std::stringstream ss;
+            ss << "Expected " << callee.function->arity() << " arguments but got " << arguments.size() << ".";
+            runtimeError(*stmt->paren, ss.str());
+            return callee;
+        }
+        else
+        {
+            return callee.function->call(this, arguments);
+        }
     }
+    return callee;
 }
 
 Object Interpreter::evaluate(Expr *expr)
@@ -505,5 +520,24 @@ void Interpreter::interpret(std::vector<Stmt *> statements)
         {
             break;
         }
+    }
+}
+
+void Interpreter::resolve(Expr * expr, int depth)
+{
+    (*locals)[expr] = depth;
+}
+
+Object Interpreter::lookUpVariable(Token *name, Variable *expr)
+{
+    auto it = locals->find(expr);
+    if (it != locals->end())
+    {
+        int distance = it->second;
+        return environment->getAt(distance, name);
+    }
+    else
+    {
+        return globals->get(name);
     }
 }

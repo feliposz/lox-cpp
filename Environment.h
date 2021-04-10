@@ -30,7 +30,7 @@ public:
     void define(std::string name, Object value)
     {
         // TODO: check redefinition?
-        values.emplace(name, value);
+        values[name] = value;
     }
 
     void assign(Token *name, Object value)
@@ -71,6 +71,28 @@ public:
         Lox::runtimeError(*name, "Undefined variable '" + name->lexeme + "'");
         Object nil;
         return nil;
+    }
+
+    Environment *ancestor(int distance)
+    {
+        Environment *environment = this;
+        for (int i = 0; i < distance; i++)
+        {
+            environment = environment->enclosing;
+        }
+        return environment;
+    }
+
+    Object getAt(int distance, Token *name)
+    {
+        Environment *environment = ancestor(distance);
+        return environment->values[name->lexeme];
+    }
+
+    void defineAt(int distance, Token *name, Object value)
+    {
+        Environment *environment = ancestor(distance);
+        environment->values[name->lexeme] = value;
     }
 
 };

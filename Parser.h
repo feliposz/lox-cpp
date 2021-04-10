@@ -9,7 +9,6 @@ class Parser
 private:
     unsigned int current = 0;
     unsigned int loopDepth = 0;
-    unsigned int funDepth = 0;
     std::vector<Token> tokens;
     Stmt *declaration();
     Stmt *varDeclaration();

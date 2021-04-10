@@ -156,6 +156,7 @@
     <ClCompile Include="LoxFunction.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="Resolver.cpp" />
     <ClCompile Include="Scanner.cpp" />
     <ClCompile Include="Token.cpp" />
   </ItemGroup>
@@ -173,6 +174,7 @@
     <ClInclude Include="NativeFunctions.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Parser.h" />
+    <ClInclude Include="Resolver.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="Stmt.h" />
     <ClInclude Include="Token.h" />
