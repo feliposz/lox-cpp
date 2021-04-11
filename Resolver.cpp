@@ -8,12 +8,20 @@ Resolver::Resolver(Interpreter *interpreter)
 
 void Resolver::beginScope()
 {
-    scopes.push_back(new std::unordered_map<std::string, bool>());
+    scopes.push_back(new std::unordered_map<std::string, VariableFlags>());
 }
 
 void Resolver::endScope()
 {
-    delete scopes.back();
+    auto scope = scopes.back();
+    for (const auto &pair : *scope)
+    {
+        if (!pair.second.referenced)
+        {
+            Lox::error(0, "Unreferenced variable: " + pair.first);
+        }
+    }
+    delete scope;
     scopes.pop_back();
 }
 
@@ -31,7 +39,8 @@ void Resolver::declare(Token * name)
     {
         Lox::error(*name, "Variable already defined in this scope.");
     }
-    (*scope)[name->lexeme] = false;
+    (*scope)[name->lexeme].initialized = false;
+    (*scope)[name->lexeme].referenced = false;
 }
 
 void Resolver::define(Token * name)
@@ -42,7 +51,7 @@ void Resolver::define(Token * name)
     }
 
     auto scope = scopes.back();
-    (*scope)[name->lexeme] = true;
+    (*scope)[name->lexeme].initialized = true;
 }
 
 void Resolver::resolveLocal(Expr *expr, Token *name)
@@ -106,10 +115,11 @@ void Resolver::visitVariable(Variable * expr)
         auto it = scope->find(expr->name->lexeme);
         if (it != scope->end())
         {
-            if (!it->second)
+            if (!it->second.initialized)
             {
                 Lox::error(*expr->name, "Can't read local variable in its own initializer.");
             }
+            it->second.referenced = true;
         }
     }
 

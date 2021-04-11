@@ -13,9 +13,15 @@ enum FunctionType
     FunctionType_Function,
 };
 
+struct VariableFlags
+{
+    bool initialized;
+    bool referenced;
+};
+
 class Resolver
 {
-    std::vector<std::unordered_map<std::string, bool> *> scopes;
+    std::vector<std::unordered_map<std::string, VariableFlags> *> scopes;
     Interpreter *interpreter;
     FunctionType currentFunction;
 
