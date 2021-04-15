@@ -103,8 +103,7 @@ void * Parser::function(std::string kind)
                 Block *body = (Block *)blockStatement();
                 if (kind == "lambda")
                 {
-                    //return new Lambda(keyword, params, body);
-                    Lox::error(*keyword, "Lambda not supported.");
+                    return new Lambda(keyword, params, body);
                 }
                 else
                 {

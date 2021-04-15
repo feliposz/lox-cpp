@@ -18,7 +18,7 @@ void Resolver::endScope()
     {
         if (!pair.second.referenced)
         {
-            Lox::error(0, "Unreferenced variable: " + pair.first);
+            //Lox::error(0, "Unreferenced variable: " + pair.first);
         }
     }
     delete scope;
@@ -135,6 +135,11 @@ void Resolver::visitCall(Call * stmt)
     }
 }
 
+void Resolver::visitLambda(Lambda* stmt)
+{
+    resolveFunction(stmt, FunctionType_Lambda);
+}
+
 void Resolver::resolve(Expr * expr)
 {
     if (expr)
@@ -150,8 +155,8 @@ void Resolver::resolve(Expr * expr)
             case ExprType_Unary: visitUnary((Unary *)expr); break;
             case ExprType_Variable: visitVariable((Variable *)expr); break;
             case ExprType_Call: visitCall((Call *)expr); break;
-            default:
-                Lox::error(EOF_TOKEN, "Invalid expression type.");
+            case ExprType_Lambda: visitLambda((Lambda *)expr); break;
+            default: Lox::error(0, "Invalid expression type.");
         }
     }
 }
@@ -210,17 +215,33 @@ void Resolver::visitFunction(Function * stmt)
     resolveFunction(stmt, FunctionType_Function);
 }
 
-void Resolver::resolveFunction(Function *stmt, FunctionType type)
+void Resolver::resolveFunction(void *stmt, FunctionType type)
 {
     FunctionType enclosingFunction = currentFunction;
     currentFunction = type;
     beginScope();
-    for (auto &param : stmt->params->list)
+    ListToken *params = 0;
+    ListStmt *statements = 0;
+    if (type == FunctionType_Function)
+    {
+        params = ((Function *)stmt)->params;
+        statements = ((Function *)stmt)->body->statements;
+    }
+    else if (type == FunctionType_Lambda)
+    {
+        params = ((Lambda *)stmt)->params;
+        statements = ((Lambda *)stmt)->body->statements;
+    }
+    else
+    {
+        // TODO: Handle error
+    }
+    for (auto &param : params->list)
     {
         declare(param);
         define(param);
     }
-    resolve(stmt->body->statements->list);
+    resolve(statements->list);
     endScope();
     currentFunction = enclosingFunction;
 }
@@ -261,8 +282,7 @@ void Resolver::resolve(Stmt *stmt)
             case StmtType_Break: visitBreak((Break *)stmt); break;
             case StmtType_Function: visitFunction((Function *)stmt); break;
             case StmtType_Return: visitReturn((Return *)stmt); break;
-            default:
-                Lox::error(EOF_TOKEN, "Invalid statement type.");
+            default: Lox::error(0, "Invalid statement type.");
         }
     }
 }

@@ -20,45 +20,26 @@ enum StmtType
 struct Stmt
 {
     StmtType type;
-
-    Stmt(StmtType type)
-    {
-        this->type = type;
-    }
-
-    virtual ~Stmt()
-    {
-    }
+    Stmt(StmtType type) : type(type) {}
+    virtual ~Stmt() {}
 };
 
 struct Expression : public Stmt
 {
     Expr *expression;
 
-    Expression(Expr *expression) : Stmt(StmtType_Expression)
-    {
-        this->expression = expression;
-    }
+    Expression(Expr *expression) : Stmt(StmtType_Expression), expression(expression) {}
 
-    ~Expression()
-    {
-        delete expression;
-    }
+    ~Expression();
 };
 
 struct Print : public Stmt
 {
     Expr *expression;
 
-    Print(Expr *expression) : Stmt(StmtType_Print)
-    {
-        this->expression = expression;
-    }
+    Print(Expr *expression) : Stmt(StmtType_Print), expression(expression) {}
 
-    ~Print()
-    {
-        delete expression;
-    }
+    ~Print();
 };
 
 struct Var : public Stmt
@@ -66,32 +47,18 @@ struct Var : public Stmt
     Token *name;
     Expr *initializer;
 
-    Var(Token *name, Expr *initializer) : Stmt(StmtType_Var)
-    {
-        this->name = name;
-        this->initializer = initializer;
-    }
+    Var(Token *name, Expr *initializer) : Stmt(StmtType_Var), name(name), initializer(initializer) {}
 
-    ~Var()
-    {
-        delete name;
-        delete initializer;
-    }
+    ~Var();
 };
 
 struct Block : public Stmt
 {
     ListStmt *statements;
 
-    Block(ListStmt *statements) : Stmt(StmtType_Block)
-    {
-        this->statements = statements;
-    }
+    Block(ListStmt *statements) : Stmt(StmtType_Block), statements(statements) {}
 
-    ~Block()
-    {
-        delete statements;
-    }
+    ~Block();
 };
 
 struct Function : public Stmt
@@ -100,19 +67,9 @@ struct Function : public Stmt
     ListToken *params;
     Block *body;
 
-    Function(Token *name, ListToken *params, Block *body) : Stmt(StmtType_Function)
-    {
-        this->name = name;
-        this->params = params;
-        this->body = body;
-    }
+    Function(Token *name, ListToken *params, Block *body) : Stmt(StmtType_Function), name(name), params(params), body(body) {}
 
-    ~Function()
-    {
-        delete name;
-        delete params;
-        delete body;
-    }
+    ~Function();
 };
 
 struct If : public Stmt
@@ -121,19 +78,9 @@ struct If : public Stmt
     Stmt *thenBranch;
     Stmt *elseBranch;
 
-    If(Expr *condition, Stmt *thenBranch, Stmt *elseBranch) : Stmt(StmtType_If)
-    {
-        this->condition = condition;
-        this->thenBranch = thenBranch;
-        this->elseBranch = elseBranch;
-    }
+    If(Expr *condition, Stmt *thenBranch, Stmt *elseBranch) : Stmt(StmtType_If), condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {}
 
-    ~If()
-    {
-        delete condition;
-        delete thenBranch;
-        delete elseBranch;
-    }
+    ~If();
 };
 
 struct While : public Stmt
@@ -141,17 +88,9 @@ struct While : public Stmt
     Expr *condition;
     Stmt *body;
 
-    While(Expr *condition, Stmt *body) : Stmt(StmtType_While)
-    {
-        this->condition = condition;
-        this->body = body;
-    }
+    While(Expr *condition, Stmt *body) : Stmt(StmtType_While), condition(condition), body(body) {}
 
-    ~While()
-    {
-        delete condition;
-        delete body;
-    }
+    ~While();
 };
 
 struct Return : public Stmt
@@ -159,31 +98,17 @@ struct Return : public Stmt
     Token *keyword;
     Expr *value;
 
-    Return(Token *keyword, Expr *value) : Stmt(StmtType_Return)
-    {
-        this->keyword = keyword;
-        this->value = value;
-    }
+    Return(Token *keyword, Expr *value) : Stmt(StmtType_Return), keyword(keyword), value(value) {}
 
-    ~Return()
-    {
-        delete keyword;
-        delete value;
-    }
+    ~Return();
 };
 
 struct Break : public Stmt
 {
     Token *keyword;
 
-    Break(Token *keyword) : Stmt(StmtType_Break)
-    {
-        this->keyword = keyword;
-    }
+    Break(Token *keyword) : Stmt(StmtType_Break), keyword(keyword) {}
 
-    ~Break()
-    {
-        delete keyword;
-    }
+    ~Break();
 };
 

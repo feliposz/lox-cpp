@@ -28,15 +28,8 @@ void defineBaseType(std::ofstream &writer, std::string &className)
     writer << "struct " << className << std::endl;
     writer << "{" << std::endl;
     writer << "    " << className << "Type type;" << std::endl;
-    writer << std::endl;
-    writer << "    " << className << "(" << className << "Type type)" << std::endl;;
-    writer << "    {" << std::endl;
-    writer << "        this->type = type;" << std::endl;
-    writer << "    }" << std::endl;
-    writer << std::endl;
-    writer << "    virtual ~" << className << "()" << std::endl;;
-    writer << "    {" << std::endl;
-    writer << "    }" << std::endl;
+    writer << "    " << className << "(" << className << "Type type) : type(type) {}" << std::endl;;
+    writer << "    virtual ~" << className << "() {}" << std::endl;
     writer << "};" << std::endl << std::endl;
 }
 
@@ -72,73 +65,98 @@ void defineType(std::ofstream &writer, const char *basename, std::string &classN
         writer << parts[0] << " *" << parts[1];;
         first = false;
     }
-    writer << ") : " << basename << "(" << basename << "Type_" << className << ")" << std::endl;
+    writer << ") : " << basename << "(" << basename << "Type_" << className << ")";
 
     // Constructor body
-    writer << "    {" << std::endl;
     for (auto &field : fields)
     {
         std::vector<std::string> parts;
         splitString(' ', field, parts);
-        writer << "        this->" << parts[1] << " = " << parts[1] << ";" << std::endl;
+        writer << ", " << parts[1] << "(" << parts[1] << ")";
     }
-    writer << "    }" << std::endl;
+    writer << " {}" << std::endl;
 
     // Destructor
     writer << std::endl;
-    writer << "    ~" << className << "()" << std::endl;
-    writer << "    {" << std::endl;
-    for (auto &field : fields)
-    {
-        std::vector<std::string> parts;
-        splitString(' ', field, parts);
-        writer << "        delete " << parts[1] << ";" << std::endl;
-    }
-    writer << "    }" << std::endl;
+    writer << "    ~" << className << "();" << std::endl;
 
     writer << "};" << std::endl << std::endl;
 }
 
+void implementType(std::ofstream &writer, const char *basename, std::string &className, std::string &fieldStr)
+{
+    std::vector<std::string> fields;
+
+    splitString(',', fieldStr, fields);
+
+    // Destructor
+    writer << std::endl;
+    writer << className << "::~" << className << "()" << std::endl;
+    writer << "{" << std::endl;
+    for (auto &field : fields)
+    {
+        std::vector<std::string> parts;
+        splitString(' ', field, parts);
+        writer << "    delete " << parts[1] << ";" << std::endl;
+    }
+    writer << "}" << std::endl;
+}
+
 void defineAst(const char *outputDir, const char *basename, std::vector<std::string> &types, std::vector<std::string> &includes)
 {
-    std::ostringstream path; // TODO: change to ostringstream?
-    path << outputDir << "/" << basename << ".h" << std::ends;
-    std::ofstream writer(path.str());
-    if (!writer.bad())
+    std::ostringstream pathH, pathCpp; // TODO: change to ostringstream?
+    pathH << outputDir << "/" << basename << ".h" << std::ends;
+    pathCpp << outputDir << "/" << basename << ".cpp" << std::ends;
+    std::ofstream writerH(pathH.str());
+    std::ofstream writerCpp(pathCpp.str());
+    if (writerH.bad())
     {
-        writer << "#pragma once" << std::endl << std::endl;
-
-        for (auto &include : includes)
-        {
-            writer << "#include \"" << include << ".h\"" << std::endl;
-        }
-
-        writer << std::endl;
-        writer << "enum " << basename << "Type" << std::endl;
-        writer << "{" << std::endl;
-        for (auto &type : types)
-        {
-            std::vector<std::string> parts;
-            splitString(':', type, parts);
-            writer << "    " << basename << "Type_" << parts[0] << "," << std::endl;
-        }
-        writer << "};" << std::endl << std::endl;
-
-        std::string baseClassName(basename);
-        defineBaseType(writer, baseClassName);
-
-        for (auto &type : types)
-        {
-            std::vector<std::string> parts;
-            splitString(':', type, parts);
-            defineType(writer, basename, parts[0], parts[1]);
-        }
-
-        writer.close();
+        std::cerr << "Error opening " << pathH.str() << " for writing." << std::endl;
+    }
+    else if (writerCpp.bad())
+    {
+        std::cerr << "Error opening " << pathCpp.str() << " for writing." << std::endl;
     }
     else
     {
-        std::cerr << "Error opening " << path.str() << " for writing." << std::endl;
+        writerH << "#pragma once" << std::endl << std::endl;
+
+        for (auto &include : includes)
+        {
+            writerH << "#include \"" << include << ".h\"" << std::endl;
+        }
+
+        writerCpp << "#include \"" << basename << ".h\"" << std::endl;
+        if (strcmp(basename, "Expr") == 0)
+        {
+            writerH << "struct Block;" << std::endl;
+            writerCpp << "#include \"Stmt.h\"" << std::endl;
+        }
+
+        writerH << std::endl;
+        writerH << "enum " << basename << "Type" << std::endl;
+        writerH << "{" << std::endl;
+        for (auto &type : types)
+        {
+            std::vector<std::string> parts;
+            splitString(':', type, parts);
+            writerH << "    " << basename << "Type_" << parts[0] << "," << std::endl;
+        }
+        writerH << "};" << std::endl << std::endl;
+
+        std::string baseClassName(basename);
+        defineBaseType(writerH, baseClassName);
+
+        for (auto &type : types)
+        {
+            std::vector<std::string> parts;
+            splitString(':', type, parts);
+            defineType(writerH, basename, parts[0], parts[1]);
+            implementType(writerCpp, basename, parts[0], parts[1]);
+        }
+
+        writerH.close();
+        writerCpp.close();
     }
 }
 
@@ -162,7 +180,7 @@ int main(int argc, char *argv[])
         "Unary    : Token oper, Expr right",
         "Variable : Token name",
         "Call     : Expr callee, Token paren, ListExpr arguments",
-        //"Lambda   : Token keyword, ListToken params, Block body",
+        "Lambda   : Token keyword, ListToken params, Block body",
     };
     std::vector<std::string> exprIncludes = { "Token", "ListToken", "ListExpr" };
     defineAst(outputDir, "Expr", exprTypes, exprIncludes);

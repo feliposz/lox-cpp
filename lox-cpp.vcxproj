@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Expr.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="ListExpr.cpp" />
     <ClCompile Include="ListStmt.cpp" />
@@ -154,10 +155,12 @@
     <ClCompile Include="lox-cpp.cpp" />
     <ClCompile Include="Lox.cpp" />
     <ClCompile Include="LoxFunction.cpp" />
+    <ClCompile Include="LoxLambda.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Resolver.cpp" />
     <ClCompile Include="Scanner.cpp" />
+    <ClCompile Include="Stmt.cpp" />
     <ClCompile Include="Token.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +174,7 @@
     <ClInclude Include="ListToken.h" />
     <ClInclude Include="Lox.h" />
     <ClInclude Include="LoxFunction.h" />
+    <ClInclude Include="LoxLambda.h" />
     <ClInclude Include="NativeFunctions.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Parser.h" />

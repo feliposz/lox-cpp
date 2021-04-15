@@ -3,6 +3,7 @@
 #include "Token.h"
 #include "ListToken.h"
 #include "ListExpr.h"
+struct Block;
 
 enum ExprType
 {
@@ -15,20 +16,14 @@ enum ExprType
     ExprType_Unary,
     ExprType_Variable,
     ExprType_Call,
+    ExprType_Lambda,
 };
 
 struct Expr
 {
     ExprType type;
-
-    Expr(ExprType type)
-    {
-        this->type = type;
-    }
-
-    virtual ~Expr()
-    {
-    }
+    Expr(ExprType type) : type(type) {}
+    virtual ~Expr() {}
 };
 
 struct Assign : public Expr
@@ -36,17 +31,9 @@ struct Assign : public Expr
     Token *name;
     Expr *value;
 
-    Assign(Token *name, Expr *value) : Expr(ExprType_Assign)
-    {
-        this->name = name;
-        this->value = value;
-    }
+    Assign(Token *name, Expr *value) : Expr(ExprType_Assign), name(name), value(value) {}
 
-    ~Assign()
-    {
-        delete name;
-        delete value;
-    }
+    ~Assign();
 };
 
 struct Ternary : public Expr
@@ -57,23 +44,9 @@ struct Ternary : public Expr
     Token *oper2;
     Expr *third;
 
-    Ternary(Expr *first, Token *oper1, Expr *second, Token *oper2, Expr *third) : Expr(ExprType_Ternary)
-    {
-        this->first = first;
-        this->oper1 = oper1;
-        this->second = second;
-        this->oper2 = oper2;
-        this->third = third;
-    }
+    Ternary(Expr *first, Token *oper1, Expr *second, Token *oper2, Expr *third) : Expr(ExprType_Ternary), first(first), oper1(oper1), second(second), oper2(oper2), third(third) {}
 
-    ~Ternary()
-    {
-        delete first;
-        delete oper1;
-        delete second;
-        delete oper2;
-        delete third;
-    }
+    ~Ternary();
 };
 
 struct Binary : public Expr
@@ -82,19 +55,9 @@ struct Binary : public Expr
     Token *oper;
     Expr *right;
 
-    Binary(Expr *left, Token *oper, Expr *right) : Expr(ExprType_Binary)
-    {
-        this->left = left;
-        this->oper = oper;
-        this->right = right;
-    }
+    Binary(Expr *left, Token *oper, Expr *right) : Expr(ExprType_Binary), left(left), oper(oper), right(right) {}
 
-    ~Binary()
-    {
-        delete left;
-        delete oper;
-        delete right;
-    }
+    ~Binary();
 };
 
 struct Logical : public Expr
@@ -103,49 +66,27 @@ struct Logical : public Expr
     Token *oper;
     Expr *right;
 
-    Logical(Expr *left, Token *oper, Expr *right) : Expr(ExprType_Logical)
-    {
-        this->left = left;
-        this->oper = oper;
-        this->right = right;
-    }
+    Logical(Expr *left, Token *oper, Expr *right) : Expr(ExprType_Logical), left(left), oper(oper), right(right) {}
 
-    ~Logical()
-    {
-        delete left;
-        delete oper;
-        delete right;
-    }
+    ~Logical();
 };
 
 struct Grouping : public Expr
 {
     Expr *expression;
 
-    Grouping(Expr *expression) : Expr(ExprType_Grouping)
-    {
-        this->expression = expression;
-    }
+    Grouping(Expr *expression) : Expr(ExprType_Grouping), expression(expression) {}
 
-    ~Grouping()
-    {
-        delete expression;
-    }
+    ~Grouping();
 };
 
 struct Literal : public Expr
 {
     Object *value;
 
-    Literal(Object *value) : Expr(ExprType_Literal)
-    {
-        this->value = value;
-    }
+    Literal(Object *value) : Expr(ExprType_Literal), value(value) {}
 
-    ~Literal()
-    {
-        delete value;
-    }
+    ~Literal();
 };
 
 struct Unary : public Expr
@@ -153,32 +94,18 @@ struct Unary : public Expr
     Token *oper;
     Expr *right;
 
-    Unary(Token *oper, Expr *right) : Expr(ExprType_Unary)
-    {
-        this->oper = oper;
-        this->right = right;
-    }
+    Unary(Token *oper, Expr *right) : Expr(ExprType_Unary), oper(oper), right(right) {}
 
-    ~Unary()
-    {
-        delete oper;
-        delete right;
-    }
+    ~Unary();
 };
 
 struct Variable : public Expr
 {
     Token *name;
 
-    Variable(Token *name) : Expr(ExprType_Variable)
-    {
-        this->name = name;
-    }
+    Variable(Token *name) : Expr(ExprType_Variable), name(name) {}
 
-    ~Variable()
-    {
-        delete name;
-    }
+    ~Variable();
 };
 
 struct Call : public Expr
@@ -187,18 +114,19 @@ struct Call : public Expr
     Token *paren;
     ListExpr *arguments;
 
-    Call(Expr *callee, Token *paren, ListExpr *arguments) : Expr(ExprType_Call)
-    {
-        this->callee = callee;
-        this->paren = paren;
-        this->arguments = arguments;
-    }
+    Call(Expr *callee, Token *paren, ListExpr *arguments) : Expr(ExprType_Call), callee(callee), paren(paren), arguments(arguments) {}
 
-    ~Call()
-    {
-        delete callee;
-        delete paren;
-        delete arguments;
-    }
+    ~Call();
+};
+
+struct Lambda : public Expr
+{
+    Token *keyword;
+    ListToken *params;
+    Block *body;
+
+    Lambda(Token *keyword, ListToken *params, Block *body) : Expr(ExprType_Lambda), keyword(keyword), params(params), body(body) {}
+
+    ~Lambda();
 };
 

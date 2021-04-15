@@ -1,5 +1,6 @@
 #include "Interpreter.h"
 #include "NativeFunctions.h"
+#include "LoxLambda.h"
 
 Environment *Interpreter::environment;
 Environment *Interpreter::globals;
@@ -357,6 +358,12 @@ Object Interpreter::visitCall(Call *stmt)
     return callee;
 }
 
+Object Interpreter::visitLambda(Lambda *expr)
+{
+    Object lambda(new LoxLambda(expr, environment));
+    return lambda;
+}
+
 Object Interpreter::evaluate(Expr *expr)
 {
     if (expr)
@@ -372,9 +379,10 @@ Object Interpreter::evaluate(Expr *expr)
             case ExprType_Unary: return visitUnary((Unary *)expr);
             case ExprType_Variable: return visitVariable((Variable *)expr);
             case ExprType_Call: return visitCall((Call *)expr);
+            case ExprType_Lambda: return visitLambda((Lambda *)expr);
+            default: Lox::error(0, "Invalid expression type.");
         }
-    }
-    Lox::error(EOF_TOKEN, "Invalid expression type.");
+    }    
     Object nil;
     return nil;
 }
@@ -497,8 +505,7 @@ void Interpreter::execute(Stmt *stmt)
             case StmtType_Break: visitBreak((Break *)stmt); break;
             case StmtType_Function: visitFunction((Function *)stmt); break;
             case StmtType_Return: visitReturn((Return *)stmt); break;
-            default:
-                Lox::error(EOF_TOKEN, "Invalid statement type.");
+            default: Lox::error(0, "Invalid statement type.");
         }
     }
 }

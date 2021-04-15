@@ -11,6 +11,7 @@ enum FunctionType
 {
     FunctionType_None,
     FunctionType_Function,
+    FunctionType_Lambda,
 };
 
 struct VariableFlags
@@ -39,6 +40,7 @@ class Resolver
     void visitUnary(Unary *expr);
     void visitVariable(Variable *expr);
     void visitCall(Call *stmt);
+    void visitLambda(Lambda *stmt);
     void resolve(Expr *expr);
     void visitPrint(Print *stmt);
     void visitExpression(Expression *stmt);
@@ -48,7 +50,7 @@ class Resolver
     void visitWhile(While *stmt);
     void visitBreak(Break *stmt);
     void visitFunction(Function *stmt);
-    void resolveFunction(Function *stmt, FunctionType type);
+    void resolveFunction(void *stmt, FunctionType type);
     void visitReturn(Return *stmt);
     void resolve(Stmt *stmt);
 public:
