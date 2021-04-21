@@ -3,6 +3,7 @@
 #include <string>
 
 class LoxCallable;
+class LoxClass;
 
 enum ObjectType
 {
@@ -12,6 +13,7 @@ enum ObjectType
     TYPE_STRING,
     TYPE_BOOL,
     TYPE_FUNCTION,
+    TYPE_CLASS,
 };
 
 class Object
@@ -22,6 +24,7 @@ public:
     double numLiteral;
     bool boolLiteral;
     LoxCallable *function;
+    LoxClass *loxClass;
 
     Object()
     {
@@ -50,6 +53,12 @@ public:
     {
         type = TYPE_FUNCTION;
         this->function = function;
+    }
+
+    Object(LoxClass *loxClass)
+    {
+        type = TYPE_CLASS;
+        this->loxClass = loxClass;
     }
 
     ~Object();

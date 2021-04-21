@@ -28,6 +28,12 @@ Function::~Function()
     delete body;
 }
 
+Class::~Class()
+{
+    delete name;
+    delete methods;
+}
+
 If::~If()
 {
     delete condition;

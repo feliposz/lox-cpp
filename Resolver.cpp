@@ -215,6 +215,12 @@ void Resolver::visitFunction(Function * stmt)
     resolveFunction(stmt, FunctionType_Function);
 }
 
+void Resolver::visitClass(Class *stmt)
+{
+    declare(stmt->name);
+    define(stmt->name);
+}
+
 void Resolver::resolveFunction(void *stmt, FunctionType type)
 {
     FunctionType enclosingFunction = currentFunction;
@@ -281,6 +287,7 @@ void Resolver::resolve(Stmt *stmt)
             case StmtType_While: visitWhile((While *)stmt); break;
             case StmtType_Break: visitBreak((Break *)stmt); break;
             case StmtType_Function: visitFunction((Function *)stmt); break;
+            case StmtType_Class: visitClass((Class *)stmt); break;
             case StmtType_Return: visitReturn((Return *)stmt); break;
             default: Lox::error(0, "Invalid statement type.");
         }

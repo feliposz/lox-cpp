@@ -50,6 +50,7 @@ class Resolver
     void visitWhile(While *stmt);
     void visitBreak(Break *stmt);
     void visitFunction(Function *stmt);
+    void visitClass(Class *stmt);
     void resolveFunction(void *stmt, FunctionType type);
     void visitReturn(Return *stmt);
     void resolve(Stmt *stmt);

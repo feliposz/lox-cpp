@@ -44,6 +44,7 @@ public:
     void visitWhile(While *stmt);
     void visitBreak(Break *stmt);
     void visitFunction(Function *stmt);
+    void visitClass(Class *stmt);
     void visitReturn(Return *stmt);
     void execute(Stmt *stmt);
     void interpret(std::vector<Stmt *> statements);

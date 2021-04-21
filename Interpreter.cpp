@@ -1,6 +1,7 @@
 #include "Interpreter.h"
 #include "NativeFunctions.h"
 #include "LoxLambda.h"
+#include "LoxClass.h"
 
 Environment *Interpreter::environment;
 Environment *Interpreter::globals;
@@ -260,7 +261,7 @@ Object Interpreter::visitBinary(Binary *expr)
             runtimeError(*expr->oper, "Invalid binary operator.");
     }
 
-    return nullptr;
+    return left;
 }
 
 Object Interpreter::visitLogical(Logical *expr)
@@ -437,15 +438,14 @@ Object Interpreter::executeBlock(Block *stmt, Environment *execEnvironment)
         returnSet = false;
         return returnValue;
     }
-    Object nil; // TODO: return
+    Object nil;
     return nil;
 }
 
 void Interpreter::visitBlock(Block *stmt)
 {
-    Environment *locals = new Environment(environment);
-    executeBlock(stmt, locals);
-    delete locals;
+    Environment locals(environment);
+    executeBlock(stmt, &locals);
 }
 
 void Interpreter::visitIf(If *stmt)
@@ -484,6 +484,12 @@ void Interpreter::visitFunction(Function *stmt)
     environment->define(stmt->name, declaration);
 }
 
+void Interpreter::visitClass(Class *stmt)
+{
+    Object loxClass(new LoxClass(stmt->name->lexeme));
+    environment->define(stmt->name, loxClass);
+}
+
 void Interpreter::visitReturn(Return *stmt)
 {
     returnValue = evaluate(stmt->value);
@@ -504,6 +510,7 @@ void Interpreter::execute(Stmt *stmt)
             case StmtType_While: visitWhile((While *)stmt); break;
             case StmtType_Break: visitBreak((Break *)stmt); break;
             case StmtType_Function: visitFunction((Function *)stmt); break;
+            case StmtType_Class: visitClass((Class *)stmt); break;
             case StmtType_Return: visitReturn((Return *)stmt); break;
             default: Lox::error(0, "Invalid statement type.");
         }

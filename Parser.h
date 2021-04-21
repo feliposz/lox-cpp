@@ -13,6 +13,7 @@ private:
     Stmt *declaration();
     Stmt *varDeclaration();
     void *function(std::string kind);
+    Stmt *classDeclaration();
     Stmt *statement();
     Stmt *printStatement();
     Stmt *expressionStatement();

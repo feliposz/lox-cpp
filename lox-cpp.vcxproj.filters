@@ -60,6 +60,9 @@
     <ClCompile Include="LoxLambda.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ListFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Token.h">
@@ -117,6 +120,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LoxLambda.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ListFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoxClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

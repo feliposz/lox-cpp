@@ -3,6 +3,7 @@
 #include "Expr.h"
 #include "ListStmt.h"
 #include "ListToken.h"
+#include "ListFunction.h"
 
 enum StmtType
 {
@@ -11,6 +12,7 @@ enum StmtType
     StmtType_Var,
     StmtType_Block,
     StmtType_Function,
+    StmtType_Class,
     StmtType_If,
     StmtType_While,
     StmtType_Return,
@@ -70,6 +72,16 @@ struct Function : public Stmt
     Function(Token *name, ListToken *params, Block *body) : Stmt(StmtType_Function), name(name), params(params), body(body) {}
 
     ~Function();
+};
+
+struct Class : public Stmt
+{
+    Token *name;
+    ListFunction *methods;
+
+    Class(Token *name, ListFunction *methods) : Stmt(StmtType_Class), name(name), methods(methods) {}
+
+    ~Class();
 };
 
 struct If : public Stmt

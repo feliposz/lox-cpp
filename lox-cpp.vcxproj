@@ -150,6 +150,7 @@
     <ClCompile Include="Expr.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="ListExpr.cpp" />
+    <ClCompile Include="ListFunction.cpp" />
     <ClCompile Include="ListStmt.cpp" />
     <ClCompile Include="ListToken.cpp" />
     <ClCompile Include="lox-cpp.cpp" />
@@ -165,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AstPrinter.h" />
+    <ClInclude Include="ListFunction.h" />
     <ClInclude Include="LoxCallable.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="Expr.h" />
@@ -173,6 +175,7 @@
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="ListToken.h" />
     <ClInclude Include="Lox.h" />
+    <ClInclude Include="LoxClass.h" />
     <ClInclude Include="LoxFunction.h" />
     <ClInclude Include="LoxLambda.h" />
     <ClInclude Include="NativeFunctions.h" />

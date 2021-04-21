@@ -36,6 +36,10 @@ Stmt * Parser::declaration()
     {
         return (Stmt *)function("function");
     }
+    else if (match(CLASS))
+    {
+        return classDeclaration();
+    }
     else if (match(VAR))
     {
         return varDeclaration();
@@ -121,6 +125,29 @@ void * Parser::function(std::string kind)
     if (keyword)
     {
         delete keyword;
+    }
+    return nullptr;
+}
+
+Stmt * Parser::classDeclaration()
+{
+    if (consume(IDENTIFIER, "Expect class name."))
+    {
+        Token *name = new Token(previous());
+        if (consume(LEFT_BRACE, "Expect '{' before class body."))
+        {
+            ListFunction *methods = new ListFunction();
+            while (!check(RIGHT_BRACE) && !isAtEnd())
+            {
+                methods->list.push_back((Function *)function("method"));
+            }
+            if (consume(RIGHT_BRACE, "Expect '}' after class body."))
+            {
+                return new Class(name, methods);
+            }
+            delete methods;
+        }
+        delete name;
     }
     return nullptr;
 }
