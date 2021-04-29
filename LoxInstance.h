@@ -1,10 +1,14 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include "LoxClass.h"
+#include "Token.h"
+#include "Lox.h"
 
 class LoxInstance
 {
+    std::unordered_map<std::string, Object> fields;
     LoxClass *loxClass;
 
 public:
@@ -14,5 +18,20 @@ public:
     std::string str()
     {
         return loxClass->name + " instance";
+    }
+
+    Object get(Token *name)
+    {
+        if (fields.count(name->lexeme))
+        {
+            return fields[name->lexeme];
+        }
+        Lox::runtimeError(*name, "Undefined property '" + name->lexeme + "'.");
+        return Object();
+    }
+
+    void set(Token *name, Object value)
+    {
+        fields[name->lexeme] = value;
     }
 };

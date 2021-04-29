@@ -13,9 +13,11 @@ enum ExprType
     ExprType_Logical,
     ExprType_Grouping,
     ExprType_Literal,
+    ExprType_Set,
     ExprType_Unary,
     ExprType_Variable,
     ExprType_Call,
+    ExprType_Get,
     ExprType_Lambda,
 };
 
@@ -89,6 +91,17 @@ struct Literal : public Expr
     ~Literal();
 };
 
+struct Set : public Expr
+{
+    Expr *object;
+    Token *name;
+    Expr *value;
+
+    Set(Expr *object, Token *name, Expr *value) : Expr(ExprType_Set), object(object), name(name), value(value) {}
+
+    ~Set();
+};
+
 struct Unary : public Expr
 {
     Token *oper;
@@ -117,6 +130,16 @@ struct Call : public Expr
     Call(Expr *callee, Token *paren, ListExpr *arguments) : Expr(ExprType_Call), callee(callee), paren(paren), arguments(arguments) {}
 
     ~Call();
+};
+
+struct Get : public Expr
+{
+    Expr *object;
+    Token *name;
+
+    Get(Expr *object, Token *name) : Expr(ExprType_Get), object(object), name(name) {}
+
+    ~Get();
 };
 
 struct Lambda : public Expr

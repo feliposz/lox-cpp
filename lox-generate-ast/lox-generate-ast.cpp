@@ -177,9 +177,11 @@ int main(int argc, char *argv[])
         "Logical  : Expr left, Token oper, Expr right",
         "Grouping : Expr expression",
         "Literal  : Object value",
+        "Set      : Expr object, Token name, Expr value",
         "Unary    : Token oper, Expr right",
         "Variable : Token name",
         "Call     : Expr callee, Token paren, ListExpr arguments",
+        "Get      : Expr object, Token name",
         "Lambda   : Token keyword, ListToken params, Block body",
     };
     std::vector<std::string> exprIncludes = { "Token", "ListToken", "ListExpr" };

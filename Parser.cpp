@@ -367,6 +367,12 @@ Expr * Parser::assignment()
             delete expr;
             return new Assign(name, value);
         }
+        else if (expr->type == ExprType_Get)
+        {
+            Get *get = (Get *)expr;
+            Expr *value = assignment();
+            return new Set(get->object, get->name, value);
+        }
 
         error(equals, "Invalid assign target.");
     }
@@ -511,6 +517,17 @@ Expr * Parser::call()
         if (match(LEFT_PAREN))
         {
             expr = finishCall(expr);
+        }
+        else if (match(DOT))
+        {
+            if (consume(IDENTIFIER, "Expect property name after '.'."))
+            {
+                expr = new Get(expr, new Token(previous()));
+            }
+            else
+            {
+                break;
+            }
         }
         else
         {

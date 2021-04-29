@@ -35,11 +35,13 @@ class Resolver
     void visitTernary(Ternary *expr);
     void visitBinary(Binary *expr);
     void visitLogical(Logical *expr);
+    void visitSet(Set *expr);
     void visitGrouping(Grouping *expr);
     void visitLiteral(Literal *expr);
     void visitUnary(Unary *expr);
     void visitVariable(Variable *expr);
     void visitCall(Call *stmt);
+    void visitGet(Get *stmt);
     void visitLambda(Lambda *stmt);
     void resolve(Expr *expr);
     void visitPrint(Print *stmt);

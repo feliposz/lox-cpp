@@ -33,6 +33,8 @@ public:
     Object visitUnary(Unary *expr);
     Object visitVariable(Variable *expr);
     Object visitCall(Call *stmt);
+    Object visitGet(Get *expr);
+    Object visitSet(Set *expr);
     Object visitLambda(Lambda *expr);
     Object evaluate(Expr *expr);
     void visitPrint(Print *stmt);

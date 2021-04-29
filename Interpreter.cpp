@@ -2,6 +2,7 @@
 #include "NativeFunctions.h"
 #include "LoxLambda.h"
 #include "LoxClass.h"
+#include "LoxInstance.h"
 
 Environment *Interpreter::environment;
 Environment *Interpreter::globals;
@@ -360,6 +361,30 @@ Object Interpreter::visitCall(Call *stmt)
     return callee;
 }
 
+Object Interpreter::visitGet(Get *expr)
+{
+    Object obj = evaluate(expr->object);
+    if (obj.type == TYPE_INSTANCE)
+    {
+        return obj.loxInstance->get(expr->name);
+    }
+    runtimeError(*expr->name, "Only instances have properties.");
+    return Object();
+}
+
+Object Interpreter::visitSet(Set *expr)
+{
+    Object obj = evaluate(expr->object);
+    if (obj.type == TYPE_INSTANCE)
+    {
+        Object value = evaluate(expr->value);
+        obj.loxInstance->set(expr->name, value);
+        return value;
+    }
+    runtimeError(*expr->name, "Only instances have properties.");
+    return Object();
+}
+
 Object Interpreter::visitLambda(Lambda *expr)
 {
     Object lambda(new LoxLambda(expr, environment));
@@ -381,6 +406,8 @@ Object Interpreter::evaluate(Expr *expr)
             case ExprType_Unary: return visitUnary((Unary *)expr);
             case ExprType_Variable: return visitVariable((Variable *)expr);
             case ExprType_Call: return visitCall((Call *)expr);
+            case ExprType_Get: return visitGet((Get *)expr);
+            case ExprType_Set: return visitSet((Set *)expr);
             case ExprType_Lambda: return visitLambda((Lambda *)expr);
             default: Lox::error(0, "Invalid expression type.");
         }

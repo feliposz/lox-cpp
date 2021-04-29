@@ -135,6 +135,17 @@ void Resolver::visitCall(Call * stmt)
     }
 }
 
+void Resolver::visitGet(Get *expr)
+{
+    resolve(expr->object);
+}
+
+void Resolver::visitSet(Set *expr)
+{
+    resolve(expr->value);
+    resolve(expr->object);
+}
+
 void Resolver::visitLambda(Lambda* stmt)
 {
     resolveFunction(stmt, FunctionType_Lambda);
@@ -150,11 +161,13 @@ void Resolver::resolve(Expr * expr)
             case ExprType_Ternary: visitTernary((Ternary *)expr); break;
             case ExprType_Binary: visitBinary((Binary *)expr); break;
             case ExprType_Logical: visitLogical((Logical *)expr); break;
+            case ExprType_Set: visitSet((Set *)expr); break;
             case ExprType_Grouping: visitGrouping((Grouping *)expr); break;
             case ExprType_Literal: visitLiteral((Literal *)expr); break;
             case ExprType_Unary: visitUnary((Unary *)expr); break;
             case ExprType_Variable: visitVariable((Variable *)expr); break;
             case ExprType_Call: visitCall((Call *)expr); break;
+            case ExprType_Get: visitGet((Get *)expr); break;
             case ExprType_Lambda: visitLambda((Lambda *)expr); break;
             default: Lox::error(0, "Invalid expression type.");
         }

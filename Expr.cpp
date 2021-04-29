@@ -40,6 +40,13 @@ Literal::~Literal()
     delete value;
 }
 
+Set::~Set()
+{
+    delete object;
+    delete name;
+    delete value;
+}
+
 Unary::~Unary()
 {
     delete oper;
@@ -56,6 +63,12 @@ Call::~Call()
     delete callee;
     delete paren;
     delete arguments;
+}
+
+Get::~Get()
+{
+    delete object;
+    delete name;
 }
 
 Lambda::~Lambda()
