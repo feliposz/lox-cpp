@@ -4,6 +4,7 @@
 
 class LoxCallable;
 class LoxClass;
+class LoxInstance;
 
 enum ObjectType
 {
@@ -14,6 +15,7 @@ enum ObjectType
     TYPE_BOOL,
     TYPE_FUNCTION,
     TYPE_CLASS,
+    TYPE_INSTANCE,
 };
 
 class Object
@@ -25,6 +27,7 @@ public:
     bool boolLiteral;
     LoxCallable *function;
     LoxClass *loxClass;
+    LoxInstance *loxInstance;
 
     Object()
     {
@@ -59,6 +62,12 @@ public:
     {
         type = TYPE_CLASS;
         this->loxClass = loxClass;
+    }
+
+    Object(LoxInstance *loxInstance)
+    {
+        type = TYPE_INSTANCE;
+        this->loxInstance = loxInstance;
     }
 
     ~Object();

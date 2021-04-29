@@ -338,22 +338,23 @@ Object Interpreter::visitCall(Call *stmt)
         arguments.push_back(evaluate(argument));
     }
 
-    if (callee.type != TYPE_FUNCTION)
+    if ((callee.type != TYPE_FUNCTION) && (callee.type != TYPE_CLASS))
     {
         runtimeError(*stmt->paren, "Can only call functions and methods.");
     }
     else
     {
-        if (callee.function->arity() != arguments.size())
+        LoxCallable *callable = callee.type == TYPE_CLASS ? callee.loxClass : callee.function;
+        if (callable->arity() != arguments.size())
         {
             std::stringstream ss;
-            ss << "Expected " << callee.function->arity() << " arguments but got " << arguments.size() << ".";
+            ss << "Expected " << callable->arity() << " arguments but got " << arguments.size() << ".";
             runtimeError(*stmt->paren, ss.str());
             return callee;
         }
         else
         {
-            return callee.function->call(this, arguments);
+            return callable->call(this, arguments);
         }
     }
     return callee;

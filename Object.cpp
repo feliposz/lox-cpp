@@ -2,6 +2,7 @@
 #include "Object.h"
 #include "LoxCallable.h"
 #include "LoxClass.h"
+#include "LoxInstance.h"
 
 Object::~Object()
 {
@@ -39,6 +40,10 @@ std::string Object::str()
     else if (type == TYPE_CLASS)
     {
         return loxClass->str();
+    }
+    else if (type == TYPE_INSTANCE)
+    {
+        return loxInstance->str();
     }
     else
     {
