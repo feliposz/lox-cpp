@@ -1,9 +1,9 @@
-#include "../AstPrinter.h"
+#include "AstPrinter.h"
 
 int main(int argc, char *argv[])
 {
     Object *nil = new Object();
-    Object *o123 = new Object(123);
+    Object *o123 = new Object(123.0);
     Literal *l123 = new Literal(o123);
     Token *minus = new Token(MINUS, "-", nil, 1);
     Unary *um123 = new Unary(minus, l123);
