@@ -8,6 +8,7 @@ public:
     static bool hadError;
     static bool hadRuntimeError;
     static void runFile(char *filename);
+    static void runPipe();
     static void runPrompt();
     static void run(std::string source, bool repl);
     static void error(int line, std::string message);

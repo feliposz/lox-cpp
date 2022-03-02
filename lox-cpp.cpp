@@ -1,4 +1,6 @@
 #include <iostream>
+#include <stdio.h>
+#include <io.h>
 #include "Lox.h"
 
 #define EXIT_USAGE 64
@@ -16,7 +18,14 @@ int main(int argc, char *argv[])
     }
     else
     {
-        Lox::runPrompt();
+        if (_isatty(_fileno(stdin)))
+        {
+            Lox::runPrompt();
+        }
+        else
+        {
+            Lox::runPipe();
+        }
     }
     return EXIT_SUCCESS;
 }

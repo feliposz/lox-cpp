@@ -146,7 +146,6 @@ Stmt * Parser::classDeclaration()
                 }
                 else
                 {
-                    // TEMP
                     delete methods;
                     delete name;
                     return nullptr;

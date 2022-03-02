@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <iterator>
 #include "Lox.h"
 #include "Scanner.h"
 #include "AstPrinter.h"
@@ -33,6 +34,26 @@ void Lox::runFile(char *filename)
     else
     {
         std::cerr << "Could not open file " << filename << std::endl;
+    }
+}
+
+void Lox::runPipe()
+{
+    std::cin >> std::noskipws;
+
+    std::istream_iterator<char> begin(std::cin);
+    std::istream_iterator<char> end;
+    std::string input(begin, end);
+
+    run(input, false);
+
+    if (hadError)
+    {
+        exit(65);
+    }
+    if (hadRuntimeError)
+    {
+        exit(70);
     }
 }
 
