@@ -385,6 +385,11 @@ Object Interpreter::visitSet(Set *expr)
     return Object();
 }
 
+Object Interpreter::visitThis(This *expr)
+{
+    return lookUpVariable(expr->keyword, expr);
+}
+
 Object Interpreter::visitLambda(Lambda *expr)
 {
     Object lambda(new LoxLambda(expr, environment));
@@ -408,6 +413,7 @@ Object Interpreter::evaluate(Expr *expr)
             case ExprType_Call: return visitCall((Call *)expr);
             case ExprType_Get: return visitGet((Get *)expr);
             case ExprType_Set: return visitSet((Set *)expr);
+            case ExprType_This: return visitThis((This *)expr);
             case ExprType_Lambda: return visitLambda((Lambda *)expr);
             default: Lox::error(0, "Invalid expression type.");
         }
@@ -508,13 +514,20 @@ void Interpreter::visitBreak(Break *stmt)
 
 void Interpreter::visitFunction(Function *stmt)
 {
-    Object declaration(new LoxFunction(stmt, environment));
+    Object declaration(new LoxFunction(stmt, environment, false));
     environment->define(stmt->name, declaration);
 }
 
 void Interpreter::visitClass(Class *stmt)
 {
-    Object loxClass(new LoxClass(stmt->name->lexeme));
+    std::unordered_map<std::string, LoxFunction*>* methods = new std::unordered_map<std::string, LoxFunction*>();
+    for (const auto &method : stmt->methods->list)
+    {
+        LoxFunction* function = new LoxFunction(method, environment, method->name->lexeme == "init");
+        methods->emplace(method->name->lexeme, function);
+    }
+
+    Object loxClass(new LoxClass(stmt->name->lexeme, methods));
     environment->define(stmt->name, loxClass);
 }
 
@@ -570,7 +583,7 @@ void Interpreter::resolve(Expr * expr, int depth)
     (*locals)[expr] = depth;
 }
 
-Object Interpreter::lookUpVariable(Token *name, Variable *expr)
+Object Interpreter::lookUpVariable(Token *name, Expr *expr)
 {
     auto it = locals->find(expr);
     if (it != locals->end())

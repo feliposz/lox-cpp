@@ -26,6 +26,13 @@ public:
         {
             return fields[name->lexeme];
         }
+
+        LoxFunction* method = loxClass->findMethod(name->lexeme);
+        if (method)
+        {
+            return Object(method->bind(this));
+        }
+
         Lox::runtimeError(*name, "Undefined property '" + name->lexeme + "'.");
         return Object();
     }

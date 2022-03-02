@@ -47,6 +47,11 @@ Set::~Set()
     delete value;
 }
 
+This::~This()
+{
+    delete keyword;
+}
+
 Unary::~Unary()
 {
     delete oper;

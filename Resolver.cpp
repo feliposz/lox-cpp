@@ -4,6 +4,7 @@ Resolver::Resolver(Interpreter *interpreter)
 {
     this->interpreter = interpreter;
     this->currentFunction = FunctionType_None;
+    this->currentClass = ClassType_None;
 }
 
 void Resolver::beginScope()
@@ -146,6 +147,16 @@ void Resolver::visitSet(Set *expr)
     resolve(expr->object);
 }
 
+void Resolver::visitThis(This *expr)
+{
+    if (currentClass == ClassType_None)
+    {
+        Lox::error(*expr->keyword, "Can't use 'this' outside of a class.");
+        return;
+    }
+    resolveLocal(expr, expr->keyword);
+}
+
 void Resolver::visitLambda(Lambda* stmt)
 {
     resolveFunction(stmt, FunctionType_Lambda);
@@ -162,6 +173,7 @@ void Resolver::resolve(Expr * expr)
             case ExprType_Binary: visitBinary((Binary *)expr); break;
             case ExprType_Logical: visitLogical((Logical *)expr); break;
             case ExprType_Set: visitSet((Set *)expr); break;
+            case ExprType_This: visitThis((This *)expr); break;
             case ExprType_Grouping: visitGrouping((Grouping *)expr); break;
             case ExprType_Literal: visitLiteral((Literal *)expr); break;
             case ExprType_Unary: visitUnary((Unary *)expr); break;
@@ -230,8 +242,29 @@ void Resolver::visitFunction(Function * stmt)
 
 void Resolver::visitClass(Class *stmt)
 {
+    ClassType enclosingClass = currentClass;
+    currentClass = ClassType_Class;
+
     declare(stmt->name);
     define(stmt->name);
+
+    beginScope();
+    VariableFlags flags = { true, false };
+    scopes.back()->emplace("this", flags);
+
+    for (auto method : stmt->methods->list)
+    {
+        FunctionType declaration = FunctionType_Method;
+        if (method->name->lexeme == "init")
+        {
+            declaration = FunctionType_Initializer;
+        }
+        resolveFunction(method, declaration);
+    }
+
+    endScope();
+
+    currentClass = enclosingClass;
 }
 
 void Resolver::resolveFunction(void *stmt, FunctionType type)
@@ -241,7 +274,7 @@ void Resolver::resolveFunction(void *stmt, FunctionType type)
     beginScope();
     ListToken *params = 0;
     ListStmt *statements = 0;
-    if (type == FunctionType_Function)
+    if (type == FunctionType_Function || type == FunctionType_Method || type == FunctionType_Initializer)
     {
         params = ((Function *)stmt)->params;
         statements = ((Function *)stmt)->body->statements;
@@ -253,7 +286,7 @@ void Resolver::resolveFunction(void *stmt, FunctionType type)
     }
     else
     {
-        // TODO: Handle error
+        Lox::error(0, "FunctionType not implemented!");
     }
     for (auto &param : params->list)
     {
@@ -274,6 +307,11 @@ void Resolver::visitReturn(Return * stmt)
 
     if (stmt->value)
     {
+        if (this->currentFunction == FunctionType_Initializer)
+        {
+            Lox::error(*stmt->keyword, "Can't return a value from an initializer.");
+        }
+
         resolve(stmt->value);
     }
 }

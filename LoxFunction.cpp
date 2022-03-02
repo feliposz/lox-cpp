@@ -10,7 +10,7 @@ int LoxFunction::arity()
 Object LoxFunction::call(Interpreter *interpreter, std::vector<Object> arguments)
 {
     Environment *environment = new Environment(closure);
-    for (int i = 0; i < declaration->params->list.size(); i++)
+    for (size_t i = 0; i < declaration->params->list.size(); i++)
     {
         environment->define(declaration->params->list[i], arguments[i]);
     }
@@ -19,6 +19,10 @@ Object LoxFunction::call(Interpreter *interpreter, std::vector<Object> arguments
     {
         // HACK: Find out a better/safer way to support closures?
         delete environment;
+    }
+    if (isInitializer)
+    {
+        return closure->getAt(0, "this");
     }
     return value;
 }

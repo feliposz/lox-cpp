@@ -139,7 +139,18 @@ Stmt * Parser::classDeclaration()
             ListFunction *methods = new ListFunction();
             while (!check(RIGHT_BRACE) && !isAtEnd())
             {
-                methods->list.push_back((Function *)function("method"));
+                Function *fn = (Function *)function("method");
+                if (fn)
+                {
+                    methods->list.push_back(fn);
+                }
+                else
+                {
+                    // TEMP
+                    delete methods;
+                    delete name;
+                    return nullptr;
+                }
             }
             if (consume(RIGHT_BRACE, "Expect '}' after class body."))
             {
@@ -594,6 +605,10 @@ Expr * Parser::primary()
             // Error ocurred, allow to recover
             return expr;
         }
+    }
+    else if (match(THIS))
+    {
+        return new This(new Token(previous()));
     }
     else if (match(IDENTIFIER))
     {

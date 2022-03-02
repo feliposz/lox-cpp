@@ -11,7 +11,15 @@ enum FunctionType
 {
     FunctionType_None,
     FunctionType_Function,
+    FunctionType_Initializer,
+    FunctionType_Method,
     FunctionType_Lambda,
+};
+
+enum ClassType
+{
+    ClassType_None,
+    ClassType_Class
 };
 
 struct VariableFlags
@@ -25,6 +33,7 @@ class Resolver
     std::vector<std::unordered_map<std::string, VariableFlags> *> scopes;
     Interpreter *interpreter;
     FunctionType currentFunction;
+    ClassType currentClass;
 
     void beginScope();
     void endScope();
@@ -36,6 +45,7 @@ class Resolver
     void visitBinary(Binary *expr);
     void visitLogical(Logical *expr);
     void visitSet(Set *expr);
+    void visitThis(This *expr);
     void visitGrouping(Grouping *expr);
     void visitLiteral(Literal *expr);
     void visitUnary(Unary *expr);

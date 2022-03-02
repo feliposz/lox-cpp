@@ -14,6 +14,7 @@ enum ExprType
     ExprType_Grouping,
     ExprType_Literal,
     ExprType_Set,
+    ExprType_This,
     ExprType_Unary,
     ExprType_Variable,
     ExprType_Call,
@@ -100,6 +101,15 @@ struct Set : public Expr
     Set(Expr *object, Token *name, Expr *value) : Expr(ExprType_Set), object(object), name(name), value(value) {}
 
     ~Set();
+};
+
+struct This : public Expr
+{
+    Token *keyword;
+
+    This(Token *keyword) : Expr(ExprType_This), keyword(keyword) {}
+
+    ~This();
 };
 
 struct Unary : public Expr

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "Lox.h"
 #include "Expr.h"
 #include "Stmt.h"
@@ -35,6 +36,7 @@ public:
     Object visitCall(Call *stmt);
     Object visitGet(Get *expr);
     Object visitSet(Set *expr);
+    Object visitThis(This *expr);
     Object visitLambda(Lambda *expr);
     Object evaluate(Expr *expr);
     void visitPrint(Print *stmt);
@@ -51,5 +53,5 @@ public:
     void execute(Stmt *stmt);
     void interpret(std::vector<Stmt *> statements);
     void resolve(Expr *expr, int depth);
-    Object lookUpVariable(Token *name, Variable *expr);
+    Object lookUpVariable(Token *name, Expr *expr);
 };

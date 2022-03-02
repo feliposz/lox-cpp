@@ -89,6 +89,12 @@ public:
         return environment->values[name->lexeme];
     }
 
+    Object getAt(int distance, std::string name)
+    {
+        Environment *environment = ancestor(distance);
+        return environment->values[name];
+    }
+
     void defineAt(int distance, Token *name, Object value)
     {
         Environment *environment = ancestor(distance);

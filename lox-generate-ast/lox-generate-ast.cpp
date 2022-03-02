@@ -178,6 +178,7 @@ int main(int argc, char *argv[])
         "Grouping : Expr expression",
         "Literal  : Object value",
         "Set      : Expr object, Token name, Expr value",
+        "This     : Token keyword",
         "Unary    : Token oper, Expr right",
         "Variable : Token name",
         "Call     : Expr callee, Token paren, ListExpr arguments",

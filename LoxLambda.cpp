@@ -10,7 +10,7 @@ int LoxLambda::arity()
 Object LoxLambda::call(Interpreter *interpreter, std::vector<Object> arguments)
 {
     Environment *environment = new Environment(closure);
-    for (int i = 0; i < declaration->params->list.size(); i++)
+    for (size_t i = 0; i < declaration->params->list.size(); i++)
     {
         environment->define(declaration->params->list[i], arguments[i]);
     }
