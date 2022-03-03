@@ -249,7 +249,7 @@ void Resolver::visitClass(Class *stmt)
     define(stmt->name);
 
     beginScope();
-    VariableFlags flags = { true, false };
+    VariableFlags flags = { true, true };
     scopes.back()->emplace("this", flags);
 
     for (auto method : stmt->methods->list)

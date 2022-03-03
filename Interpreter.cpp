@@ -95,7 +95,7 @@ Object Interpreter::visitAssign(Assign *expr)
     }
     else
     {
-        globals->define(expr->name, value);
+        globals->assign(expr->name, value);
     }
     return value;
 }
