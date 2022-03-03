@@ -368,6 +368,15 @@ Object Interpreter::visitGet(Get *expr)
     {
         return obj.loxInstance->get(expr->name);
     }
+    else if (obj.type == TYPE_CLASS)
+    {
+        LoxFunction *fn = obj.loxClass->findStatic(expr->name->lexeme);
+        if (fn)
+        {
+            return Object(fn);
+        }
+        runtimeError(*expr->name, "Class has no such static method.");
+    }
     runtimeError(*expr->name, "Only instances have properties.");
     return Object();
 }
@@ -527,7 +536,14 @@ void Interpreter::visitClass(Class *stmt)
         methods->emplace(method->name->lexeme, function);
     }
 
-    Object loxClass(new LoxClass(stmt->name->lexeme, methods));
+    std::unordered_map<std::string, LoxFunction*>* statics = new std::unordered_map<std::string, LoxFunction*>();
+    for (const auto &method : stmt->statics->list)
+    {
+        LoxFunction* function = new LoxFunction(method, environment, false);
+        statics->emplace(method->name->lexeme, function);
+    }
+
+    Object loxClass(new LoxClass(stmt->name->lexeme, methods, statics));
     environment->define(stmt->name, loxClass);
 }
 

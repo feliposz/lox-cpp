@@ -262,6 +262,16 @@ void Resolver::visitClass(Class *stmt)
         resolveFunction(method, declaration);
     }
 
+    for (auto method : stmt->statics->list)
+    {
+        FunctionType declaration = FunctionType_Function;
+        if (method->name->lexeme == "init")
+        {
+            Lox::error(0, "'init' cannot be a static method");
+        }
+        resolveFunction(method, declaration);
+    }
+
     endScope();
 
     currentClass = enclosingClass;

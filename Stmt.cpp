@@ -32,6 +32,7 @@ Class::~Class()
 {
     delete name;
     delete methods;
+    delete statics;
 }
 
 If::~If()

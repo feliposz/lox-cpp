@@ -78,8 +78,9 @@ struct Class : public Stmt
 {
     Token *name;
     ListFunction *methods;
+    ListFunction *statics;
 
-    Class(Token *name, ListFunction *methods) : Stmt(StmtType_Class), name(name), methods(methods) {}
+    Class(Token *name, ListFunction *methods, ListFunction *statics) : Stmt(StmtType_Class), name(name), methods(methods), statics(statics) {}
 
     ~Class();
 };

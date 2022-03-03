@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
         "Var        : Token name, Expr initializer",
         "Block      : ListStmt statements",
         "Function   : Token name, ListToken params, Block body",
-        "Class      : Token name, ListFunction methods",
+        "Class      : Token name, ListFunction methods, ListFunction statics",
         "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
         "While      : Expr condition, Stmt body",
         "Return     : Token keyword, Expr value",

@@ -74,6 +74,10 @@ void * Parser::function(std::string kind)
 {
     Token *name = nullptr;
     Token *keyword = nullptr;
+    if (kind == "class function")
+    {
+        consume(CLASS, "Expect class keyword.");
+    }
     if (kind == "lambda")
     {
         keyword = new Token(previous());
@@ -110,8 +114,7 @@ void * Parser::function(std::string kind)
                     return new Lambda(keyword, params, body);
                 }
                 else
-                {
-                    
+                {   
                     return new Function(name, params, body);
                 }
             }
@@ -137,25 +140,44 @@ Stmt * Parser::classDeclaration()
         if (consume(LEFT_BRACE, "Expect '{' before class body."))
         {
             ListFunction *methods = new ListFunction();
+            ListFunction *statics = new ListFunction();
+            bool declarationsOk = true;
             while (!check(RIGHT_BRACE) && !isAtEnd())
             {
-                Function *fn = (Function *)function("method");
-                if (fn)
+                Function *fn;
+                if (check(CLASS))
                 {
-                    methods->list.push_back(fn);
+                    fn = (Function *)function("class function");
+                    if (fn)
+                    {
+                        statics->list.push_back(fn);
+                    }
+                    else
+                    {
+                        declarationsOk = false;
+                        break;
+                    }
                 }
                 else
                 {
-                    delete methods;
-                    delete name;
-                    return nullptr;
+                    fn = (Function *)function("method");
+                    if (fn)
+                    {
+                        methods->list.push_back(fn);
+                    }
+                    else
+                    {
+                        declarationsOk = false;
+                        break;
+                    }
                 }
             }
-            if (consume(RIGHT_BRACE, "Expect '}' after class body."))
+            if (declarationsOk && consume(RIGHT_BRACE, "Expect '}' after class body."))
             {
-                return new Class(name, methods);
+                return new Class(name, methods, statics);
             }
             delete methods;
+            delete statics;
         }
         delete name;
     }

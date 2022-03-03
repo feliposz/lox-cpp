@@ -10,12 +10,24 @@ class LoxClass : public LoxCallable
 public:
     std::string name;
     std::unordered_map<std::string, LoxFunction*> *methods;
+    std::unordered_map<std::string, LoxFunction*> *statics;
 
-    LoxClass(std::string name, std::unordered_map<std::string, LoxFunction*> *methods) : name(name), methods(methods) {}
+    LoxClass(std::string name, std::unordered_map<std::string, LoxFunction*> *methods, std::unordered_map<std::string, LoxFunction*> *statics)
+        : name(name), methods(methods), statics(statics) {}
     
     std::string str()
     {
         return name;
+    }
+
+    LoxFunction* findStatic(std::string name)
+    {
+        auto it = statics->find(name);
+        if (it != statics->end())
+        {
+            return it->second;
+        }
+        return nullptr;
     }
 
     LoxFunction* findMethod(std::string name)
