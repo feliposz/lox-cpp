@@ -52,6 +52,9 @@ bool Interpreter::isEqual(Object a, Object b)
         case TYPE_BOOL: return a.boolLiteral == b.boolLiteral;
         case TYPE_NUMBER: return a.numLiteral == b.numLiteral;
         case TYPE_STRING: return a.strLiteral == b.strLiteral;
+        case TYPE_FUNCTION: return a.function == b.function;
+        case TYPE_CLASS: return a.loxClass == b.loxClass;
+        case TYPE_INSTANCE: return a.loxInstance == b.loxInstance;
     }
 
     return false;
@@ -355,7 +358,9 @@ Object Interpreter::visitCall(Call *stmt)
         }
         else
         {
-            return callable->call(this, arguments);
+            Object result = callable->call(this, arguments);
+            returnSet = false;
+            return result;
         }
     }
     return callee;
@@ -478,7 +483,6 @@ Object Interpreter::executeBlock(Block *stmt, Environment *execEnvironment)
     environment = savedEnvironment;
     if (returnSet)
     {
-        returnSet = false;
         return returnValue;
     }
     Object nil;
