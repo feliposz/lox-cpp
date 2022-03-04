@@ -248,6 +248,15 @@ void Resolver::visitClass(Class *stmt)
     declare(stmt->name);
     define(stmt->name);
 
+    if (stmt->superclass)
+    {
+        if (stmt->name->lexeme == stmt->superclass->name->lexeme)
+        {
+            Lox::error(*stmt->superclass->name, "A class can't inherit from itself.");
+        }
+        resolve(stmt->superclass);
+    }
+
     beginScope();
     VariableFlags flags = { true, true };
     scopes.back()->emplace("this", flags);

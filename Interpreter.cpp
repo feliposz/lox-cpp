@@ -547,7 +547,18 @@ void Interpreter::visitClass(Class *stmt)
         statics->emplace(method->name->lexeme, function);
     }
 
-    Object loxClass(new LoxClass(stmt->name->lexeme, methods, statics));
+    Object superclass;
+    if (stmt->superclass)
+    {
+        superclass = evaluate(stmt->superclass);
+        if (superclass.type != TYPE_CLASS)
+        {
+            Lox::runtimeError(*stmt->superclass->name, "Superclass must be a class.");
+            return;
+        }
+    }
+
+    Object loxClass(new LoxClass(stmt->name->lexeme, superclass.loxClass, methods, statics));
     environment->define(stmt->name, loxClass);
 }
 

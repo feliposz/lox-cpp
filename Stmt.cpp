@@ -31,6 +31,7 @@ Function::~Function()
 Class::~Class()
 {
     delete name;
+    delete superclass;
     delete methods;
     delete statics;
 }

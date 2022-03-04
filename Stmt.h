@@ -77,10 +77,11 @@ struct Function : public Stmt
 struct Class : public Stmt
 {
     Token *name;
+    Variable *superclass;
     ListFunction *methods;
     ListFunction *statics;
 
-    Class(Token *name, ListFunction *methods, ListFunction *statics) : Stmt(StmtType_Class), name(name), methods(methods), statics(statics) {}
+    Class(Token *name, Variable *superclass, ListFunction *methods, ListFunction *statics) : Stmt(StmtType_Class), name(name), superclass(superclass), methods(methods), statics(statics) {}
 
     ~Class();
 };

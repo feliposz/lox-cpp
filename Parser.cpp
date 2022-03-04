@@ -137,6 +137,12 @@ Stmt * Parser::classDeclaration()
     if (consume(IDENTIFIER, "Expect class name."))
     {
         Token *name = new Token(previous());
+        Variable *superclass = nullptr;
+        if (match(LESS))
+        {
+            consume(IDENTIFIER, "Expect superclass name.");
+            superclass = new Variable(new Token(previous()));
+        }
         if (consume(LEFT_BRACE, "Expect '{' before class body."))
         {
             ListFunction *methods = new ListFunction();
@@ -174,7 +180,7 @@ Stmt * Parser::classDeclaration()
             }
             if (declarationsOk && consume(RIGHT_BRACE, "Expect '}' after class body."))
             {
-                return new Class(name, methods, statics);
+                return new Class(name, superclass, methods, statics);
             }
             delete methods;
             delete statics;

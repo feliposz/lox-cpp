@@ -19,10 +19,12 @@ function run_all_tests {
   test_control
   test_break
   test_functions
+  test_recursion
   test_closure
   test_lambda
   test_classes
   test_static_method
+  test_inheritance
 
   end_tests
 }
@@ -179,6 +181,17 @@ function test_functions {
   run_test 'fun foo(){} print foo();' 'nil'
 }
 
+function test_recursion {
+  run_test '
+    fun fib(n) {
+      if (n <= 1) return n;
+      return fib(n - 2) + fib(n - 1);
+    }
+    print fib(10);
+  ' \
+  '55'
+}
+
 function test_closure {
   run_test '
       fun returnFunction() {
@@ -270,6 +283,16 @@ function test_static_method {
     print Math.square(3);
   ' \
   '9'
+}
+
+function test_inheritance {
+  run_test '
+    class A { a() { return "ok"; } }
+    class B < A {}
+    var b = B();
+    print b.a();
+  ' \
+  'ok'  
 }
 
 function begin_tests {

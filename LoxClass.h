@@ -9,11 +9,12 @@ class LoxClass : public LoxCallable
 {
 public:
     std::string name;
+    LoxClass *superclass;
     std::unordered_map<std::string, LoxFunction*> *methods;
     std::unordered_map<std::string, LoxFunction*> *statics;
 
-    LoxClass(std::string name, std::unordered_map<std::string, LoxFunction*> *methods, std::unordered_map<std::string, LoxFunction*> *statics)
-        : name(name), methods(methods), statics(statics) {}
+    LoxClass(std::string name, LoxClass *superclass, std::unordered_map<std::string, LoxFunction*> *methods, std::unordered_map<std::string, LoxFunction*> *statics)
+        : name(name), superclass(superclass), methods(methods), statics(statics) {}
     
     std::string str()
     {
@@ -27,6 +28,10 @@ public:
         {
             return it->second;
         }
+        if (superclass)
+        {
+            return superclass->findStatic(name);
+        }
         return nullptr;
     }
 
@@ -36,6 +41,10 @@ public:
         if (it != methods->end())
         {
             return it->second;
+        }
+        if (superclass)
+        {
+            return superclass->findMethod(name);
         }
         return nullptr;
     }
