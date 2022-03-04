@@ -19,7 +19,8 @@ enum FunctionType
 enum ClassType
 {
     ClassType_None,
-    ClassType_Class
+    ClassType_Class,
+    ClassType_Subclass
 };
 
 struct VariableFlags
@@ -45,6 +46,7 @@ class Resolver
     void visitBinary(Binary *expr);
     void visitLogical(Logical *expr);
     void visitSet(Set *expr);
+    void visitSuper(Super *expr);
     void visitThis(This *expr);
     void visitGrouping(Grouping *expr);
     void visitLiteral(Literal *expr);

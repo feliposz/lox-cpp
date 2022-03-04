@@ -336,6 +336,11 @@ Object Interpreter::visitCall(Call *stmt)
 {
     Object callee = evaluate(stmt->callee);
 
+    if (Lox::hadRuntimeError)
+    {
+        return callee;
+    }
+
     std::vector<Object> arguments;
     for (auto &argument : stmt->arguments->list)
     {
@@ -399,6 +404,29 @@ Object Interpreter::visitSet(Set *expr)
     return Object();
 }
 
+Object Interpreter::visitSuper(Super *expr)
+{
+    auto it = locals->find(expr);
+    if (it != locals->end())
+    {
+        int distance = it->second;
+        Object superclass = environment->getAt(distance, "super");
+        Object object = environment->getAt(distance - 1, "this");
+        LoxFunction *method = superclass.loxClass->findMethod(expr->method->lexeme);
+        if (method)
+        {
+            return method->bind(object.loxInstance);
+        }
+        else
+        {
+            runtimeError(*expr->method, "Undefined property '" + expr->method->lexeme + "'.");
+            return Object();
+        }
+    }
+    runtimeError(*expr->keyword, "Class has no superclass");
+    return Object();
+}
+
 Object Interpreter::visitThis(This *expr)
 {
     return lookUpVariable(expr->keyword, expr);
@@ -427,6 +455,7 @@ Object Interpreter::evaluate(Expr *expr)
             case ExprType_Call: return visitCall((Call *)expr);
             case ExprType_Get: return visitGet((Get *)expr);
             case ExprType_Set: return visitSet((Set *)expr);
+            case ExprType_Super: return visitSuper((Super *)expr);
             case ExprType_This: return visitThis((This *)expr);
             case ExprType_Lambda: return visitLambda((Lambda *)expr);
             default: Lox::error(0, "Invalid expression type.");
@@ -533,6 +562,20 @@ void Interpreter::visitFunction(Function *stmt)
 
 void Interpreter::visitClass(Class *stmt)
 {
+    Object superclass;
+    if (stmt->superclass)
+    {
+        superclass = evaluate(stmt->superclass);
+        if (superclass.type != TYPE_CLASS)
+        {
+            Lox::runtimeError(*stmt->superclass->name, "Superclass must be a class.");
+            return;
+        }
+
+        environment = new Environment(environment);
+        environment->define("super", superclass);
+    }
+
     std::unordered_map<std::string, LoxFunction*>* methods = new std::unordered_map<std::string, LoxFunction*>();
     for (const auto &method : stmt->methods->list)
     {
@@ -547,18 +590,13 @@ void Interpreter::visitClass(Class *stmt)
         statics->emplace(method->name->lexeme, function);
     }
 
-    Object superclass;
+    Object loxClass(new LoxClass(stmt->name->lexeme, superclass.loxClass, methods, statics));
+
     if (stmt->superclass)
     {
-        superclass = evaluate(stmt->superclass);
-        if (superclass.type != TYPE_CLASS)
-        {
-            Lox::runtimeError(*stmt->superclass->name, "Superclass must be a class.");
-            return;
-        }
+        environment = environment->ancestor(1);
     }
 
-    Object loxClass(new LoxClass(stmt->name->lexeme, superclass.loxClass, methods, statics));
     environment->define(stmt->name, loxClass);
 }
 

@@ -47,6 +47,12 @@ Set::~Set()
     delete value;
 }
 
+Super::~Super()
+{
+    delete keyword;
+    delete method;
+}
+
 This::~This()
 {
     delete keyword;

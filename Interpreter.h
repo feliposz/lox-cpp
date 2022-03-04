@@ -36,6 +36,7 @@ public:
     Object visitCall(Call *stmt);
     Object visitGet(Get *expr);
     Object visitSet(Set *expr);
+    Object visitSuper(Super *expr);
     Object visitThis(This *expr);
     Object visitLambda(Lambda *expr);
     Object evaluate(Expr *expr);

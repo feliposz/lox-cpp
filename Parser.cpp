@@ -641,6 +641,17 @@ Expr * Parser::primary()
     {
         return new Variable(new Token(previous()));
     }
+    else if (match(SUPER))
+    {
+        Token *keyword = new Token(previous());
+        consume(DOT, "Expect '.' after 'super'.");
+        if (consume(IDENTIFIER, "Expect superclass method name."))
+        {
+            Token *method = new Token(previous());
+            return new Super(keyword, method);
+        }
+        return nullptr;
+    }
     else if (match(FUN))
     {
         return (Expr *)function("lambda");

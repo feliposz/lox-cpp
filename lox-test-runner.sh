@@ -293,6 +293,29 @@ function test_inheritance {
     print b.a();
   ' \
   'ok'  
+  
+  run_test '
+      class A {
+        method() {
+          print "A method";
+        }
+      }
+
+      class B < A {
+        method() {
+          print "B method";
+        }
+
+        test() {
+          super.method();
+        }
+      }
+
+      class C < B {}
+
+      C().test();
+  ' \
+  'A method'  
 }
 
 function begin_tests {
@@ -316,13 +339,14 @@ function watch {
     local ATIME=`stat -c %Z $EXECUTABLE`
 
     if [[ "$ATIME" != "$LTIME" ]]
-    then    
+    then   
+      sleep 2 # Wait recompilation to end
       echo
       echo "Testing $EXECUTABLE"
       run_all_tests
       LTIME=$ATIME
     fi
-    sleep 1
+    sleep 2
   done
 }
 
